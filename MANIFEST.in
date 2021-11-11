@@ -1,0 +1,11 @@
+# metadata
+include LICENSE
+include WORKSPACE
+include CONTRIBUTING.md
+include README.md
+
+# python package requirements
+include requirements*.txt
+
+# tree files
+recursive-include . CMakeLists.txt *.cc *.cpp *.h *.sh *.py *.cmake
