@@ -29,5 +29,5 @@ target_link_libraries(_itree PRIVATE pybind11::module z)
 
 #########################################################
 #find_package(pybind11 REQUIRED)
-add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
-target_link_libraries(_itree.exe PRIVATE pybind11::embed z)
+##add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
+##target_link_libraries(_itree.exe PRIVATE pybind11::embed z)
