@@ -37,7 +37,8 @@ def create_environ(python_version: str) -> Dict[str, str]:
 
     env['CIBW_BUILD'] = f"cp{python_version}-*"
     
-    env['USE_PYTHON_VER'] = f"{python_version}"
+    tmp = f"{python_version}"
+    env['USE_PYTHON_VER'] = tmp[0] + "." + tmp[1:]
 
     # Don't build 32-bit wheels
     env['CIBW_SKIP'] = "*-manylinux_i686 *-win32"
