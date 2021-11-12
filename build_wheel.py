@@ -58,26 +58,23 @@ def create_environ(python_version: str) -> Dict[str, str]:
 
     # download a copy of clang to use to compile on linux. this was probably built in 2018,
     # speeds up compilation 2x
-    env['CIBW_BEFORE_BUILD_LINUX'] = """
-      (cd / && curl -L %s | tar xzf -) &&
-      pip install -r {package}/requirements.build.txt
-    """.replace('\n', ' ') % LLVM_URL
+    #env['CIBW_BEFORE_BUILD_LINUX'] = """
+    #  (cd / && curl -L %s | tar xzf -) &&
+    #  pip install -r {package}/requirements.build.txt
+    #""".replace('\n', ' ') % LLVM_URL
 
     # the double negative is counterintuitive, https://github.com/pypa/pip/issues/5735
-    env['CIBW_ENVIRONMENT'] = 'MYPY_USE_MYPYC=1 MYPYC_OPT_LEVEL=3 PIP_NO_BUILD_ISOLATION=no'
+    env['CIBW_ENVIRONMENT'] = 'PIP_NO_BUILD_ISOLATION=no'
     env['CIBW_ENVIRONMENT_LINUX'] = (
-        'MYPY_USE_MYPYC=1 MYPYC_OPT_LEVEL=3 PIP_NO_BUILD_ISOLATION=no ' +
-        'CC=/opt/llvm/bin/clang'
+        'PIP_NO_BUILD_ISOLATION=no'
     )
-    env['CIBW_ENVIRONMENT_WINDOWS'] = (
-        'MYPY_USE_MYPYC=1 MYPYC_OPT_LEVEL=2 PIP_NO_BUILD_ISOLATION=no'
-    )
+
 
     # lxml is slow to build wheels for new releases, so allow installing reqs to fail
     # if we failed to install lxml, we'll skip tests, but allow the build to succeed
-    env['CIBW_BEFORE_TEST'] = (
-        'pip install -r {project}/mypy/requirements.test.txt || true'
-    )
+    #env['CIBW_BEFORE_TEST'] = (
+    #    'pip install -r {project}/mypy/requirements.test.txt || true'
+    #)
 
     # pytest looks for configuration files in the parent directories of where the tests live.
     # since we are trying to run the tests from their installed location, we copy those into
