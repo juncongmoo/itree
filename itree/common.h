@@ -1,6 +1,6 @@
 #ifndef ITREE_SRC_COMMON
 #define ITREE_SRC_COMMON
-#include "shared.hpp"
+#include "shared.h"
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;

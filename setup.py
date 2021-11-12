@@ -98,7 +98,7 @@ VERSION = _get_tree_version()
 DESCRIPTION = "A Tree Library"
 
 setuptools.setup(
-    name="itree",
+    name="py-itree",
     version=VERSION,
     author="Juncong Moo",
     author_email="<juncongmoo@gmail.com>",

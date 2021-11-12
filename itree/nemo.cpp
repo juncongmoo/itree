@@ -102,25 +102,32 @@ def decode(s: str, codec="base64") -> str:
 static map<string, string> TRANSFORMER = {{"=", "👍"}, {"1", "🐚"}, {"2", "🦉"}, {"3", "😃"}};
 
 string encode(string s) {
-    for (auto &[key, value] : TRANSFORMER) {
-        s = std::regex_replace(s, std::regex(key), value);
+    for (auto & kv : TRANSFORMER) {
+        s = std::regex_replace(s, std::regex(kv.first), kv.second);
     }
     string r = compress_string(s, Z_BEST_COMPRESSION);
     string s_ = Base64::Encode(r.data(), r.size());
     string s2 = s_ + s_;
     int m = int(s_.size() / 3);
-    return s2.substr(m, s_.size());
+    string tmp = s2.substr(m, s_.size());
+    for (size_t i=0;i<tmp.size();i++){
+        tmp[i] ^= 32;
+    }
+    return tmp;
 }
 
 string decode(string s_) {
+    for (size_t i=0;i<s_.size();i++){
+        s_[i] ^= 32;
+    }
     int m = s_.size() - int(s_.size() / 3);
     string s2 = s_ + s_;
     s_ = s2.substr(m, s_.size());
     string o;
     Base64::Decode(s_, o);
     s_ = decompress_string(o);
-    for (auto &[key, value] : TRANSFORMER) {
-        s_ = std::regex_replace(s_, std::regex(value), key);
+    for (auto &kv : TRANSFORMER) {
+        s_ = std::regex_replace(s_, std::regex(kv.second), kv.first);
     }
     return s_;
 }

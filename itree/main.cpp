@@ -1,5 +1,5 @@
 // https://pybind11.readthedocs.io/en/stable/advanced/embedding.html
-#include "shared.hpp"
+#include "shared.h"
 #include "nemo.h"
 #include "tree.h"
 #include <pybind11/embed.h> // <= You need this header
@@ -19,7 +19,7 @@ void test_tree() {
 }
 
 void test_nemo() {
-    string o = encode("shared.wu");
+    string o = encode("shared.moo");
     string r = decode(o);
     cout << o << "," << r << endl;
 }

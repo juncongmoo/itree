@@ -1,6 +1,6 @@
 #include "node_utils.h"
 #include "common.h"
-#include "shared.hpp"
+#include "shared.h"
 
 static const double inf = std::numeric_limits<double>::infinity();
 

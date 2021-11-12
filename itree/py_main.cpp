@@ -1,7 +1,7 @@
 #include "forest.h"
 #include "nemo.h"
 #include "node.h"
-#include "shared.hpp"
+#include "shared.h"
 #include "tree.h"
 #include <iomanip> //put_time
 #include <pybind11/numpy.h>

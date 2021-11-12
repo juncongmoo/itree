@@ -1,5 +1,5 @@
 #define UUID_SYSTEM_GENERATOR
-#include "shared.hpp"
+#include "shared.h"
 #include <random>
 
 /*

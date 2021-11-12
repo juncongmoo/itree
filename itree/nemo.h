@@ -1,5 +1,5 @@
 #pragma once
-#include "shared.hpp"
+#include "shared.h"
 
 std::string compress_string(const std::string &str, int compressionlevel);
 
