@@ -92,81 +92,8 @@ string Tree::repr() {
                      extra.size(), depth, mode, monotonic);
 }
 
-void __dfs(const shared_ptr<Node> &n, unordered_set<string> &x,
-           unordered_map<string, VS> &y, string &max_leaf_node_name,
-           double &max_interval) {
-  x.insert(n->name);
-  if (n->nodes.empty()) {
-    if (n->span() > max_interval) {
-      max_leaf_node_name = n->name;
-      max_interval = n->span();
-    }
-  }
-  for (const auto &e : n->nodes) {
-    y[n->name].push_back(e->name);
-    __dfs(e, x, y, max_leaf_node_name, max_interval);
-  }
-}
-
-
-/*
-digraph tree{
-        node [shape=record margin=0 fontcolor=blue fontsize=8 width=0.5 style=filled fixedsize=true]
-        edge [fontsize=7]
-        rankdir=LR
-
-        "unicorn" [shape=record label="unicorn | c | d "];
-        "pizza" [shape=record label="one|123|456|1.23"];
-        "monkey";
-        "root";
-        "l2" [color="green" style="filled" fillcolor="yellow" label="one|123|456|1.23"];
-        "None" [shape="doublecircle" color="orange" style="filled" fillcolor="red"];
-        "piggy";
-        "icecream";
-        "l1";
-        "egg";
-        "unicorn" -> "monkey" ;
-        "root" -> "l1";
-        "root" -> "l2";
-        "root" -> "l2";
-        "root" -> "piggy";
-        "l2" -> "egg";
-        "None" -> "root";
-        "piggy" -> "unicorn";
-        "icecream" -> "pizza";
-        "l1" -> "l2";
-        "egg" -> "icecream";
-}
-*/
 string Tree::to_dot_string(const string &node_shape) {
-  string s = "digraph tree{\n";
-  s += string_format(
-      "\tnode [shape=%s margin=0 fontcolor=blue fontsize=32 width=0.5 style=filled]"
-      "\n\tedge [fontsize=8]"
-      "\n\trankdir=LR\n\n",
-      node_shape.c_str());
-  unordered_set<string> node_names;
-  unordered_map<string, VS> successors;
-  double max_interval = -2147483648.0;
-  string max_leaf_node_name = root->name;
-  __dfs(root, node_names, successors, max_leaf_node_name, max_interval);
-  for (const auto &e : node_names) {
-    s += string_format("\t\"%s\"", e.c_str());
-    if (e.substr(0,4) == "None") {
-      s += " [shape=\"doublecircle\" color=\"orange\" style=\"filled\" "
-           "fillcolor=\"green\"]";
-    } else if (e == max_leaf_node_name) {
-      s += " [shape=\"doublecircle\" color=\"green\" style=\"filled\" "
-           "fillcolor=\"yellow\"]";
-    }
-    s += ";\n";
-  }
-  for (const auto &e : successors) {
-    for (const auto &v : e.second)
-      s += string_format("\t\"%s\" -> \"%s\";\n", e.first.c_str(), v.c_str());
-  }
-  s += "}";
-  return s;
+  return ::to_dot_string(root, node_shape);
 }
 
 void remove_zsn(list<shared_ptr<Node>> &nodes) {

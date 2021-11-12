@@ -1,12 +1,21 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(itree)
 
-find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+option(LOCAL_BUILD "build locally" OFF)
 
-set(CMAKE_BUILD_TYPE Release)
+if(LOCAL_BUILD)
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O0")
+else()
+    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_CXX_FLAGS_DEBUG "") # -g
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+endif()
+
+
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "") # -g
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -29,5 +38,10 @@ target_link_libraries(_itree PRIVATE pybind11::module z)
 
 #########################################################
 #find_package(pybind11 REQUIRED)
-##add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
-##target_link_libraries(_itree.exe PRIVATE pybind11::embed z)
+if(LOCAL_BUILD)
+    add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
+    target_link_libraries(_itree.exe PRIVATE pybind11::embed z)
+else()
+    message("building in ci")
+endif()
+
