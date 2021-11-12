@@ -2,6 +2,9 @@
 Tree Documentation
 ##################
 
+.. thumbnail:: forest.jpg
+   :align: center
+
 .. toctree::
    :maxdepth: 2
    :hidden:
@@ -10,33 +13,14 @@ Tree Documentation
    changes
    recipes
 
-``tree`` is a library for working with nested data structures. In a way,
-``tree`` generalizes the builtin :func:`map` function which only supports 
-flat sequences, and allows to apply a function to each "leaf" preserving 
-the overall structure.
-
-Here's a quick example::
-
-  >>> tree.map_structure(lambda v: v**2, [[1], [[[2, 3]]], [4]])
-  [[1], [[[4, 9]]], [16]]
-
-.. note::
-
-   ``tree`` has originally been part of TensorFlow and is available
-   as ``tf.nest``.
 
 Installation
 ============
 
-Install ``tree`` by running::
+Install ``itree`` by running::
 
-  $ pip install dm-tree
+  $ pip install py-itree
 
-Support
-=======
-
-If you are having issues, please let us know by filing an issue on our
-`issue tracker <https://github.com/deepmind/tree/issues>`_.
 
 License
 =======

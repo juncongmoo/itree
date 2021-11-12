@@ -39,9 +39,11 @@ import itree
 
 project = "iTree"
 copyright = (
-    f"{datetime.date.today().year}, Juncong Moo"  # pylint: disable=redefined-builtin
+    f"{datetime.date.today().year}, Juncong Moo, Apache 2.0"  # pylint: disable=redefined-builtin
 )
 author = "Juncong Moo"
+version = itree.__version__
+release = itree.__version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -56,10 +58,29 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
+    ################################################################
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx_click.ext",
+    "sphinx_copybutton",
+    "recommonmark",
+    "sphinxcontrib.spelling",
+    "sphinx_markdown_tables",
+    "sphinx.ext.mathjax",
+    "sphinxcontrib.images",  # https://sphinxcontrib-images.readthedocs.io/en/latest/
+    "rst2pdf.pdfbuilder",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "sphinx"
+
+# Remove the prompt when copying examples
+copybutton_prompt_text = r">>> |\.\.\.|» |$ "
+copybutton_prompt_is_regexp = True
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -85,6 +106,24 @@ html_theme_options = {
     # 'collapse_navigation': False,
     # 'sticky_navigation': False,
 }
+
+from recommonmark.transform import AutoStructify
+
+
+def setup(app):
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            #'url_resolver': lambda url: github_doc_root + url,
+            "auto_toc_tree_section": "Contents",
+            "enable_math": False,
+            "enable_inline_math": False,
+            "enable_eval_rst": True,
+            "enable_auto_doc_ref": True,
+        },
+        True,
+    )
+    app.add_transform(AutoStructify)
 
 # -- Options for doctest -----------------------------------------------------
 
@@ -126,8 +165,7 @@ def linkcode_resolve(domain, info):
     except OSError:
         return None
 
-    # TODO(slebedev): support tags after we release an initial version.
-    return "https://github.com/deepmind/tree/blob/master/tree/%s#L%d#L%d" % (
+    return "https://github.com/juncongmoo/itree/blob/master/itree/%s#L%d#L%d" % (
         os.path.relpath(filename, start=os.path.dirname(itree.__file__)),
         lineno,
         lineno + len(source) - 1,

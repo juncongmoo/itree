@@ -1,2 +1,15 @@
 sphinx>=2.0.1
 sphinx_rtd_theme>=0.4.3
+sphinx-click
+sphinx-copybutton
+sphinxcontrib-spelling
+sphinx-markdown-tables
+sphinx-markdown-tables
+sphinxcontrib-images
+sphinx-bernard-theme
+sphinx-book-theme
+sphinx-press-theme
+sphinx-business-theme
+recommonmark
+rst2pdf
+#sudo yum install enchant -y
