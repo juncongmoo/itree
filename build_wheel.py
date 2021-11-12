@@ -39,6 +39,7 @@ def create_environ(python_version: str) -> Dict[str, str]:
     
     tmp = f"{python_version}"
     env['USE_PYTHON_VER'] = tmp[0] + "." + tmp[1:]
+    env['Python3_EXECUTABLE'] = '/usr/local/bin/python' + tmp[0] + "." + tmp[1:]
 
     # Don't build 32-bit wheels
     env['CIBW_SKIP'] = "*-manylinux_i686 *-win32"
