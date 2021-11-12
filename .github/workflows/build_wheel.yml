@@ -8,8 +8,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, centos-latest, macOS-latest]
+        os: [ubuntu-latest, centos-latest, macos-latest]
         python-version: [38]
+        #python-version: [36, 37, 38, 39, 310]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,8 +24,46 @@ jobs:
           python -m pip install "cibuildwheel==2.2.2"
       
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir dist
 
       - uses: actions/upload-artifact@v2
         with:
-          path: ./wheelhouse/*.whl
+          path: ./dist/*.whl
+
+
+  release:
+    name: create release
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+      - name: Release
+        # https://github.com/actions/upload-release-asset/issues/47
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs').promises;
+            const { repo: { owner, repo }, sha } = context;
+            console.log('environment', process.versions);
+            console.log({ owner, repo, sha });
+            const release = await github.repos.createRelease({
+              owner, repo,
+              // if GITHUB_REF just appears to be a branch, use tag-{commit} as the tag
+              tag_name: process.env.GITHUB_REF.includes("refs/heads/") ? "tag-" + sha : process.env.GITHUB_REF.split("/").pop(),
+              target_commitish: sha
+            });
+            console.log('created release', { release });
+            for (let file of await fs.readdir('dist')) {
+              console.log('uploading', file);
+              await github.repos.uploadReleaseAsset({
+                owner, repo,
+                release_id: release.data.id,
+                name: file,
+                data: await fs.readFile(`./dist/${file}`)
+              });
+            }
