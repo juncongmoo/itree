@@ -24,7 +24,7 @@ jobs:
       
       - name: Build wheels
         run: |
-          python itree/build_wheel.py --output-dir wheelhouse --python-version ${{ matrix.python-version}}
+          python build_wheel.py --output-dir wheelhouse --python-version ${{ matrix.python-version}}
 
       - uses: actions/upload-artifact@v2
         with:
