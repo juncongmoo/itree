@@ -87,7 +87,7 @@ void Tree::add_node(shared_ptr<Node> n) {
 }
 
 string Tree::repr() {
-  return string_format("(🌳 id={},c={},x={},d={},m={},o={})", tree_id, count,
+  return string_format("(🌳 id=%s,c=%d,x=%d,d=%d,m=%d,o=%d)", tree_id.c_str(), count,
                      extra.size(), depth, mode, monotonic);
 }
 
@@ -107,20 +107,51 @@ void __dfs(const shared_ptr<Node> &n, unordered_set<string> &x,
   }
 }
 
+
+/*
+digraph tree{
+        node [shape=record margin=0 fontcolor=blue fontsize=8 width=0.5 style=filled fixedsize=true]
+        edge [fontsize=7]
+        rankdir=LR
+
+        "unicorn" [shape=record label="unicorn | c | d "];
+        "pizza" [shape=record label="one|123|456|1.23"];
+        "monkey";
+        "root";
+        "l2" [color="green" style="filled" fillcolor="yellow" label="one|123|456|1.23"];
+        "None" [shape="doublecircle" color="orange" style="filled" fillcolor="red"];
+        "piggy";
+        "icecream";
+        "l1";
+        "egg";
+        "unicorn" -> "monkey" ;
+        "root" -> "l1";
+        "root" -> "l2";
+        "root" -> "l2";
+        "root" -> "piggy";
+        "l2" -> "egg";
+        "None" -> "root";
+        "piggy" -> "unicorn";
+        "icecream" -> "pizza";
+        "l1" -> "l2";
+        "egg" -> "icecream";
+}
+*/
 string Tree::to_dot_string(const string &node_shape) {
   string s = "digraph tree{\n";
   s += string_format(
-      "\tnode [shape={},fontsize=8,fixedsize=true,width=0.9];\n\tedge "
-      "[fontsize=8];\n\trankdir=LR;\n\n",
-      node_shape);
+      "\tnode [shape=%s margin=0 fontcolor=blue fontsize=32 width=0.5 style=filled]"
+      "\n\tedge [fontsize=8]"
+      "\n\trankdir=LR\n\n",
+      node_shape.c_str());
   unordered_set<string> node_names;
   unordered_map<string, VS> successors;
   double max_interval = -2147483648.0;
   string max_leaf_node_name = root->name;
   __dfs(root, node_names, successors, max_leaf_node_name, max_interval);
   for (const auto &e : node_names) {
-    s += string_format("\t\"{}\"", e);
-    if (e == "None") {
+    s += string_format("\t\"%s\"", e.c_str());
+    if (e.substr(0,4) == "None") {
       s += " [shape=\"doublecircle\" color=\"orange\" style=\"filled\" "
            "fillcolor=\"green\"]";
     } else if (e == max_leaf_node_name) {
@@ -131,7 +162,7 @@ string Tree::to_dot_string(const string &node_shape) {
   }
   for (const auto &e : successors) {
     for (const auto &v : e.second)
-      s += string_format("\t\"{}\" -> \"{}\";\n", e.first, v);
+      s += string_format("\t\"%s\" -> \"%s\";\n", e.first.c_str(), v.c_str());
   }
   s += "}";
   return s;

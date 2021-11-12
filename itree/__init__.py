@@ -1,6 +1,6 @@
 __version__ = "1.0.1"
 
-import _itree
+from . import _itree
 
 import time
 from abc import ABC
