@@ -7,11 +7,8 @@
 
 ```python
 >>> import itree
->>> structure = [[1], [[[2, 3]]], [4]]
->>> tree.flatten(structure)
-[1, 2, 3, 4]
->>> tree.map_structure(lambda v: v**2, structure)
-[[1], [[[4, 9]]], [16]]
+>>> itree.Node('apple')
+[🟢 n=apple,s=0.00,e=0.00,x=0,c=0]
 ```
 
 `tree` is backed by an optimized C++ implementation suitable for use in

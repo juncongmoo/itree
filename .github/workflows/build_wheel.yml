@@ -76,6 +76,7 @@ jobs:
       #repository_url: https://test.pypi.org/legacy/
 
       - name: Publish to Test PyPI
+        uses: pypa/gh-action-pypi-publish@master
         env:
           TWINE_USERNAME: "__token__"
           TWINE_PASSWORD: ${{ secrets.PYPI_TEST_API_TOKEN }}
