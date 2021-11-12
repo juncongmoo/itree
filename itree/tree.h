@@ -12,6 +12,7 @@ Format:
 
 struct PYBIND11_EXPORT Tree {
   string tree_id;
+  string parent_id="";
   shared_ptr<Node> root;
   vector<shared_ptr<Node>> stk;
   py::dict extra;
