@@ -1,10 +1,12 @@
 # iTree
 
+![](docs/forest.jpg)
+
 `itree` is a library for interval tree data structures.
 
 
 ```python
->>> import tree
+>>> import itree
 >>> structure = [[1], [[[2, 3]]], [4]]
 >>> tree.flatten(structure)
 [1, 2, 3, 4]
