@@ -8,9 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, centos-latest, macos-latest]
-        python-version: [38]
-        #python-version: [36, 37, 38, 39, 310]
+        os: [ubuntu-latest, macos-latest]
+        python-version: [36, 37, 38, 39, 310]
 
     steps:
       - uses: actions/checkout@v2
