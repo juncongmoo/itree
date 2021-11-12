@@ -36,6 +36,7 @@ def create_environ(python_version: str) -> Dict[str, str]:
     env = os.environ.copy()
 
     env['CIBW_BUILD'] = f"cp{python_version}-*"
+    print(env['CIBW_BUILD'])
     
     tmp = f"{python_version}"
     env['USE_PYTHON_VER'] = tmp[0] + "." + tmp[1:]
