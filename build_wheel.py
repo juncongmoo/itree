@@ -36,6 +36,8 @@ def create_environ(python_version: str) -> Dict[str, str]:
     env = os.environ.copy()
 
     env['CIBW_BUILD'] = f"cp{python_version}-*"
+    
+    env['USE_PYTHON_VER'] = f"{python_version}"
 
     # Don't build 32-bit wheels
     env['CIBW_SKIP'] = "*-manylinux_i686 *-win32"
@@ -103,7 +105,7 @@ def main() -> None:
     output_dir = args.output_dir
     extra_opts = args.extra_opts
     environ = create_environ(python_version)
-    script = f'python -m cibuildwheel {extra_opts} --output-dir {output_dir} {ROOT_DIR}'
+    script = f'python3 -m cibuildwheel {extra_opts} --output-dir {output_dir} {ROOT_DIR}'
     subprocess.check_call(script, shell=True, env=environ)
 
 
