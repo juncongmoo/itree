@@ -125,7 +125,8 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("nodes", &Node::nodes)
       .def_readwrite("name", &Node::name)
       .def("span", &Node::span)
-      .def("append", &Node::append);
+      .def("append", &Node::append)
+      .def("add_child", &Node::add_child);
 
   m.def("nemo_transform", &decode);
   m.def("create_virtual_node", &create_virtual_node);

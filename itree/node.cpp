@@ -16,3 +16,7 @@ string Node::__str__() {
 string Node::__repr__() { return __str__(); }
 double Node::span() { return end - start; }
 void Node::append(const shared_ptr<Node> &a) { this->nodes.emplace_back(a); }
+void Node::add_child(const Node &a) {
+  auto n = make_shared<Node>(a.name, a.start, a.end, a.extra);
+  this->nodes.emplace_back(n);
+}

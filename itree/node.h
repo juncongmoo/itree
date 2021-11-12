@@ -22,4 +22,5 @@ struct PYBIND11_EXPORT Node {
   string __repr__();
   double span();
   void append(const shared_ptr<Node> &);
+  void add_child(const Node &);
 };
