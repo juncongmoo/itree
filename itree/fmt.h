@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <utility>
 
+// https://stackoverflow.com/questions/17902405/how-to-implement-make-unique-function-in-c11
 namespace std {
     template<class T> struct _Unique_if {
         typedef unique_ptr<T> _Single_object;

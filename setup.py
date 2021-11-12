@@ -110,6 +110,7 @@ setuptools.setup(
     cmdclass=dict(build_ext=BuildCMakeExtension),
     ext_modules=[CMakeExtension("_itree", source_dir="itree")],
     zip_safe=False,
+    include_package_data=True,
     keywords=["tree", "itree", "interval tree"],
     classifiers=[
         "Development Status :: 4 - Beta",

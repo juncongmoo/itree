@@ -67,9 +67,9 @@ PYBIND11_MODULE(_itree, m) {
     In iTree, tree is a nary interval tree, plus a stack and map. Different from the traditional BS, AVL, RB Tree or interval tree, tree in iTree is a strictly insertion-time-ordered tree from top to bottom and from left to right. The values could be monotonic or not monotonic, which is marked by a `monotonic` member variable.
 
     )--")
-      .def(py::init<const string &, const string &, const py::dict &, bool, int,
+      .def(py::init<const string &, const py::dict &, bool, int,
                     double>(),
-           py::arg("s") = py::str(), py::arg("tree_id") = py::str(),
+           py::arg("tree_id") = py::str(),
            py::arg("extra") = py::dict(), py::arg("monotonic") = true,
            py::arg("capacity") = 1024,
            py::arg("zsn_threshold") =

@@ -1,6 +1,5 @@
 #pragma once
 #include "shared.hpp"
-#include <fmt/core.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 

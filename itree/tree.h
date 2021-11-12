@@ -37,7 +37,7 @@ struct PYBIND11_EXPORT Tree {
   double zsn_threshold;
 
   // https://github.com/pybind/pybind11/issues/957
-  Tree(const string &s_, const string &tree_id_, const py::dict &extra_,
+  Tree(const string &tree_id_, const py::dict &extra_,
        bool monotonic_, int capacity, double zsn_threshold_)
       : tree_id(tree_id_), extra(extra_), monotonic(monotonic_),
         zsn_threshold(zsn_threshold_) {

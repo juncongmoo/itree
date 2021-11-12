@@ -1,7 +1,7 @@
 #include "tree.h"
 #include "node_utils.h"
 #include <assert.h>
-#include <fmt/core.h>
+#include "fmt.h"
 
 bool Tree::is_valid() { return root != nullptr and !stk.empty(); }
 
@@ -87,7 +87,7 @@ void Tree::add_node(shared_ptr<Node> n) {
 }
 
 string Tree::repr() {
-  return fmt::format("(🌳 id={},c={},x={},d={},m={},o={})", tree_id, count,
+  return string_format("(🌳 id={},c={},x={},d={},m={},o={})", tree_id, count,
                      extra.size(), depth, mode, monotonic);
 }
 
@@ -109,7 +109,7 @@ void __dfs(const shared_ptr<Node> &n, unordered_set<string> &x,
 
 string Tree::to_dot_string(const string &node_shape) {
   string s = "digraph tree{\n";
-  s += fmt::format(
+  s += string_format(
       "\tnode [shape={},fontsize=8,fixedsize=true,width=0.9];\n\tedge "
       "[fontsize=8];\n\trankdir=LR;\n\n",
       node_shape);
@@ -119,7 +119,7 @@ string Tree::to_dot_string(const string &node_shape) {
   string max_leaf_node_name = root->name;
   __dfs(root, node_names, successors, max_leaf_node_name, max_interval);
   for (const auto &e : node_names) {
-    s += fmt::format("\t\"{}\"", e);
+    s += string_format("\t\"{}\"", e);
     if (e == "None") {
       s += " [shape=\"doublecircle\" color=\"orange\" style=\"filled\" "
            "fillcolor=\"green\"]";
@@ -131,7 +131,7 @@ string Tree::to_dot_string(const string &node_shape) {
   }
   for (const auto &e : successors) {
     for (const auto &v : e.second)
-      s += fmt::format("\t\"{}\" -> \"{}\";\n", e.first, v);
+      s += string_format("\t\"{}\" -> \"{}\";\n", e.first, v);
   }
   s += "}";
   return s;
