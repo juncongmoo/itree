@@ -47,7 +47,7 @@ struct PYBIND11_EXPORT Tree {
   }
   bool is_valid();
   shared_ptr<Node> get_root();
-  void add_node(shared_ptr<Node>);
+  bool add_node(shared_ptr<Node>);
   // void deserialize(const string &);
   void discover(const string &name, double start_, const py::dict &extra);
   void finish(const string &name, double end_, const py::dict &extra);

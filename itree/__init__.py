@@ -1,6 +1,9 @@
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
-from . import _itree
+try:
+    from . import _itree
+except:
+    import _itree
 
 import time
 from abc import ABC
@@ -8,6 +11,7 @@ from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random
 
+Node = _itree.Node
 
 class ITree(_itree.Tree):
     """An interval tree"""
@@ -26,9 +30,6 @@ class ITree(_itree.Tree):
 
         super(ITree, self).__init__(s=s, tree_id=tree_id, extra=extra)
 
-    def add(self, node: _itree.Node):
-        pass
-
     def start(self, a, b, extra={}):
         self.discover(a, b, extra)
 
@@ -40,15 +41,15 @@ class ITree(_itree.Tree):
             return
         self.root = _itree.consolidate(self.root)
 
-    def to_img(sf, filename=None):
+    def to_img(sf, filename=None, format='png'):
         if not filename:
-            filename = f"/tmp/{time.time()}.png"
+            filename = f"/tmp/{time.time()}.{format}"
         s = sf.to_dot_string("circle")
         with NamedTemporaryFile("wb", delete=True) as dotfile:
             dotfilename = dotfile.name
             dotfile.write(s.encode("utf-8"))
             dotfile.flush()
-            cmd = ["dot", dotfilename, "-T", "png", "-o", filename]
+            cmd = ["dot", dotfilename, "-T", format, "-o", filename]
             check_call(cmd)
         return filename
 

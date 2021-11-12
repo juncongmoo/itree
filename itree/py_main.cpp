@@ -76,7 +76,7 @@ PYBIND11_MODULE(_itree, m) {
                1e-7) // in most cases, a tree has less than 1k nodes
       .def("is_valid", &Tree::is_valid, "check if it is a valid itree")
       .def("get_root", &Tree::get_root)
-      .def("add_node", &Tree::add_node, "add a new complete node into the tree")
+      .def("add_node", &Tree::add_node, py::arg("node") = py::none(), "add a new complete node into the tree, and return true if added or false is not")
       .def("discover", &Tree::discover)
       .def("finish", &Tree::finish)
       .def("__repr__", &Tree::repr)

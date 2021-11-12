@@ -20,20 +20,10 @@ demanding applications, such as machine learning models.
 From PyPI:
 
 ```shell
-$ pip install dm-tree
+pip install --find-links https://github.com/juncongmoo/itree/releases/latest itree
 ```
 
-Directly from github using pip:
 
-```shell
-$ pip install git+git://github.com/deepmind/tree.git
-```
-
-Build from source:
-
-```shell
-$ python setup.py install
-```
 
 ## Support
 

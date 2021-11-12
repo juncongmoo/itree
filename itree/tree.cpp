@@ -74,9 +74,9 @@ void Tree::finish(const string &name, double end, const py::dict &extra) {
   stk.pop_back();
 }
 
-void Tree::add_node(shared_ptr<Node> n) {
-  if (n->span() < zsn_threshold)
-    return;
+bool Tree::add_node(shared_ptr<Node> n) {
+  if (n == nullptr or n->span() < zsn_threshold)
+    return false;
   if (stk.empty()) {
     root = n;
   } else {
@@ -84,6 +84,7 @@ void Tree::add_node(shared_ptr<Node> n) {
     stk.back()->append(n);
   }
   ++count;
+  return true;
 }
 
 string Tree::repr() {
