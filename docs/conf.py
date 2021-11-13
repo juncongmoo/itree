@@ -125,6 +125,7 @@ def setup(app):
     )
     app.add_transform(AutoStructify)
 
+source_suffix = [".rst", ".md", ".rmd"]
 # -- Options for doctest -----------------------------------------------------
 
 doctest_global_setup = """

@@ -1,5 +1,5 @@
 ##################
-iTree - An Interval Tree Library
+iTree - an Interval Tree library
 ##################
 
 .. thumbnail:: forest.jpg
@@ -9,7 +9,7 @@ iTree - An Interval Tree Library
    :maxdepth: 2
    :hidden:
 
-   api
+   tutorial
    changes
    recipes
 

@@ -13,7 +13,23 @@ import random
 
 
 class Node(_itree.Node):
-    """Tree Node"""
+    """Tree Node
+
+    Node is a nary interval tree node with the following member variables:
+
+    .. highlight:: python
+    .. code-block:: python
+
+        nid - node id, unique in a tree
+        name - node name
+        start - start value
+        end - end value
+        extra - a dictionary of extra information
+        nodes - children of the current node
+
+    When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the time stamp can be stored in the extra dictionary.
+    """
+
 
 
 class ITree(_itree.Tree):
@@ -25,7 +41,6 @@ class ITree(_itree.Tree):
         Args:
             tree_id (str, optional): a unique id of the tree. Defaults to None.
             extra (dict, optional): extra information of the tree. Defaults to {}.
-            update_min_max_required (bool, optional): used for some tree where min/max values appear in the leaf node. Defaults to False.
         """
         if tree_id is None:
             tree_id = "{:08x}".format(random.getrandbits(32))

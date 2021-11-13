@@ -105,20 +105,22 @@ PYBIND11_MODULE(_itree, m) {
   py::class_<Node, shared_ptr<Node>>(m, "Node", R"--(
     Node
 
-    Node is a nary interval tree node with 5 member variables:
+    Node is a nary interval tree node with the following member variables:
+        nid - node id, unique in a tree
         name - node name
         start - start value
         end - end value
         extra - a dictionary of extra information
         nodes - childen of the current node
 
-    When value is time itself, the start and end are time stamp. When value is not time, like network traffic, the time stamp can be stored in the extra dictionary.
+    When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the time stamp can be stored in the extra dictionary.
     )--")
       .def(py::init<const string &, double, double, const py::dict &>(),
            py::arg("name") = py::str(), py::arg("start") = 0.0,
            py::arg("end") = 0.0, py::arg("extra") = py::dict())
       .def("__str__", &Node::__str__)
       .def("__repr__", &Node::__repr__)
+      .def_readwrite("nid", &Node::nid)
       .def_readwrite("extra", &Node::extra)
       .def_readwrite("start", &Node::start)
       .def_readwrite("end", &Node::end)
