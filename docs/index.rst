@@ -24,6 +24,11 @@ Install ``itree`` by running::
 Quick Start
 ============
 
+.. note::
+
+  🟢  is normal node, 🔵 is zero interval node, 🍁 is leaf node
+
+
   >>> import itree
   >>> itree.Node('fruit', 0, 40)
   [🍁 n=fruit,s=0.00,e=40.00,x=0,c=0]
