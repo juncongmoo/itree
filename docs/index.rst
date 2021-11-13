@@ -26,7 +26,9 @@ Quick Start
 
 .. note::
 
-  🟢  is normal node, 🔵 is zero interval node, 🍁 is leaf node
+  🟢  - normal node
+  🔵  - zero interval node
+  🍁  - leaf node, which means no child node
 
 ----
 
