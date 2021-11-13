@@ -50,6 +50,50 @@ Quick Start
   [[🍁 n=apple,s=10.00,e=20.00,x=0,c=0]]
   >>> 
 
+----
+
+  from itree import ITree
+
+
+  def demo_tree():
+      t = ITree(tree_id="123", extra={"img": "1241241313.png"})
+      t.start("root", 1, {"name": "itree"})
+      t.start("math", 2, {"age": 10})
+      t.start("music", 3, {"location": [1, 2, 3]})
+      t.end("music", 4, {"price": 12.3})
+      t.end("math", 16284000, {"memory": (1, 2, 3)})
+      t.start("music", 122840057.8713503)
+      t.end("music", 1228400500)
+      t.start("music", 32840057.8713503)
+      t.start("egg", 3284.8713503)
+      t.start("icecream", 32843.8713503)
+      t.start("pizza", 32843.8713503)
+      t.end("pizza", 62845003)
+      t.end("icecream", 62845003)
+      t.end("egg", 6284500)
+      t.end("music", 628400500)
+      t.start("piggy", 3284.8713503)
+      t.start("unicorn", 32843.8713503)
+      t.start("monkey", 32843.8713503)
+      t.end("monkey", 62845003)
+      t.end("unicorn", 62845003)
+      t.end("piggy", 6284500)
+
+      t.end("root", 1628400570.8713503)
+      print(f"{t.count},{t.depth}")
+      t.consolidate()
+      img_name = t.to_img()
+      return img_name
+
+  print(demo_tree())
+
+
+Run the `demo_tree()` function, a tree digraph will be generated:
+
+.. thumbnail:: demo_tree.png
+   :align: center
+
+
 License
 =======
 
