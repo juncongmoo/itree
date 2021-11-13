@@ -1,17 +1,9 @@
 __version__ = "0.0.4"
 
-def install(package="py-itree"):
-    subprocess.check_call([sys.executable, "-m", "pip", "install","-i","https://test.pypi.org/simple/", package])
-    
-
-
 try:
     from . import _itree
 except ImportError:
-    try:
-        import _itree
-    except:
-        install()
+    import _itree
 
 import time
 from abc import ABC
@@ -19,14 +11,9 @@ from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random
 
-import subprocess
-import sys
-
 
 class Node(_itree.Node):
-    """Tree Node
-    
-    """
+    """Tree Node"""
 
 
 class ITree(_itree.Tree):
@@ -56,7 +43,7 @@ class ITree(_itree.Tree):
             return
         self.root = _itree.consolidate(self.root)
 
-    def to_img(sf, filename=None, format='png', node_shape="record"):
+    def to_img(sf, filename=None, format="png", node_shape="record"):
         try:
             if not filename:
                 filename = f"/tmp/{time.time()}.{format}"
@@ -74,7 +61,6 @@ class ITree(_itree.Tree):
 
 
 class ForestBase(_itree.Forest):
-    """Forest is a collection of trees
-    """
-    __metaclass__ = ABC
+    """Forest is a collection of trees"""
 
+    __metaclass__ = ABC
