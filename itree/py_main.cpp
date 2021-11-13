@@ -127,8 +127,8 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("nodes", &Node::nodes)
       .def_readwrite("name", &Node::name)
       .def("span", &Node::span)
-      .def("append", &Node::append)
-      .def("add_child", &Node::add_child);
+      .def("append", &Node::append, "append as current node's children by referencing")
+      .def("add_child", &Node::add_child, "add as current node's children by shallow-copying");
 
   m.def("nemo_transform", &decode);
   m.def("create_virtual_node", &create_virtual_node);

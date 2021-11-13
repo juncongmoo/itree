@@ -18,5 +18,7 @@ double Node::span() { return end - start; }
 void Node::append(const shared_ptr<Node> &a) { this->nodes.emplace_back(a); }
 void Node::add_child(const Node &a) {
   auto n = make_shared<Node>(a.name, a.start, a.end, a.extra);
+  if (!a.nodes.empty())
+    n->nodes = a.nodes;
   this->nodes.emplace_back(n);
 }
