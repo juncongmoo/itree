@@ -21,21 +21,17 @@ Install ``itree`` by running:
   🟢  - normal node; 
   🔵  - zero interval node; 
   🍁  - leaf node, which means no child node
+  🌳  - a tree
 ```
 
-----
+- Create Some Nodes
 
-```
+```python
   >>> import itree
   >>> itree.Node('fruit', 0, 40)
   [🍁 n=fruit,s=0.00,e=40.00,x=0,c=0]
   >>> itree.Node('fruit')
   [🔵 n=fruit]
-```
-
-----
-
-```
   >>> a=itree.Node('fruit', 0, 200)
   >>> b=itree.Node('apple', 10, 20)
   >>> print(a)
@@ -50,7 +46,7 @@ Install ``itree`` by running:
   >>> 
 ```
 
-----
+- Create And Render A Tree
 
 
 ```python
@@ -92,9 +88,8 @@ Run the `demo_tree()` function, a tree digraph will be generated:
 
 ![](docs/demo_tree.png)
 
-
+The green circle node is a virtual node. The yellow record box is the node with max interval.
 
 ## License
-
 
 Tree is licensed under the Apache 2.0 License.
