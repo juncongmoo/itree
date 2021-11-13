@@ -24,10 +24,13 @@ Install ``itree`` by running::
 ## Quick Start
 
 
+```
   🟢  - normal node; 
   🔵  - zero interval node; 
   🍁  - leaf node, which means no child node
+```
 
+----
 
 ```
   >>> import itree
