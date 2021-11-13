@@ -50,17 +50,21 @@ class Tree(_itree.Tree):
         super().__init__(tid=tid, extra=extra)
 
     def start(self, a, b, extra={}):
+        """discover a node with name `a` and value `b`, and extra"""
         self.discover(a, b, extra)
 
     def end(self, a, b, extra={}):
+        """finish a node with name `a` and value `b`, and extra"""
         self.finish(a, b, extra)
 
     def consolidate(self):
+        """consolidate virtual nodes if any"""
         if len(self.stk) > 1:
             return
         self.root = _consolidate(self.root)
 
     def to_img(sf, filename=None, format="png", node_shape="record"):
+        """Render tree to an image with `dot`"""
         try:
             if not filename:
                 filename = f"/tmp/{time.time()}.{format}"
@@ -77,7 +81,7 @@ class Tree(_itree.Tree):
         return filename
 
 
-class Forest(_itree.Forest):
-    """Forest is a collection of trees"""
+# Forest is a collection of trees
+Forest=_itree.Forest
 
-    __metaclass__ = ABC
+

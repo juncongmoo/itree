@@ -1,6 +1,6 @@
 # Tutorial
 
-## Concepts
+## Concept
 
 ### Virtual Node
 
@@ -21,6 +21,13 @@ In case there are multiple virtual nodes, call `itree.consolidate(node)` to merg
 
   .. automethod:: __init__
 
+  .. automethod:: start
+
+  .. automethod:: end
+
+  .. automethod:: consolidate
+
+  .. automethod:: to_img
 
 
 
