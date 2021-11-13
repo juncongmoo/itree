@@ -1,5 +1,5 @@
 ##################
-iTree Documentation
+iTree - An Interval Tree Library
 ##################
 
 .. thumbnail:: forest.jpg
