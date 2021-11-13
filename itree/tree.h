@@ -11,7 +11,7 @@ Format:
 */
 
 struct PYBIND11_EXPORT Tree {
-  string tree_id;
+  string tid;
   string parent_id="";
   shared_ptr<Node> root;
   vector<shared_ptr<Node>> stk;
@@ -38,9 +38,9 @@ struct PYBIND11_EXPORT Tree {
   double zsn_threshold;
 
   // https://github.com/pybind/pybind11/issues/957
-  Tree(const string &tree_id_, const py::dict &extra_,
+  Tree(const string &tid_, const py::dict &extra_,
        bool monotonic_, int capacity, double zsn_threshold_)
-      : tree_id(tree_id_), extra(extra_), monotonic(monotonic_),
+      : tid(tid_), extra(extra_), monotonic(monotonic_),
         zsn_threshold(zsn_threshold_) {
     root = create_virtual_node();
     stk.reserve(capacity);

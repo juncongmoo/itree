@@ -69,9 +69,9 @@ Quick Start
 ----
 
 
-  >>> from itree import ITree
+  >>> from itree import Tree
   >>> def demo_tree():
-        t = ITree(tree_id="123", extra={"img": "1241241313.png"})
+        t = Tree(tid="123", extra={"img": "1241241313.png"})
         t.start("root", 1, {"name": "itree"})
         t.start("math", 2, {"age": 10})
         t.start("music", 3, {"location": [1, 2, 3]})

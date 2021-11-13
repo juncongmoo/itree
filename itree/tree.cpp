@@ -88,7 +88,7 @@ bool Tree::add_node(shared_ptr<Node> n) {
 }
 
 string Tree::repr() {
-  return string_format("(🌳 id=%s,c=%d,x=%d,d=%d,m=%d,o=%d)", tree_id.c_str(), count,
+  return string_format("(🌳 id=%s,c=%d,x=%d,d=%d,m=%d,o=%d)", tid.c_str(), count,
                      extra.size(), depth, mode, monotonic);
 }
 

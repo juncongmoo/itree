@@ -6,11 +6,17 @@
 using namespace std;
 namespace py = pybind11;
 struct PYBIND11_EXPORT Node {
+  // node id
   unsigned int nid = 0U;
+  // node name
   string name;
+  // node start value
   double start;
+  // node end value
   double end;
+  // extra info
   py::dict extra;
+  // children nodes
   list<shared_ptr<Node>> nodes;
 
   Node(const string &name_, double start_, double end_, const py::dict &extra_)

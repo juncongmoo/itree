@@ -69,7 +69,7 @@ PYBIND11_MODULE(_itree, m) {
     )--")
       .def(py::init<const string &, const py::dict &, bool, int,
                     double>(),
-           py::arg("tree_id") = py::str(),
+           py::arg("tid") = py::str(),
            py::arg("extra") = py::dict(), py::arg("monotonic") = true,
            py::arg("capacity") = 1024,
            py::arg("zsn_threshold") =
@@ -86,7 +86,7 @@ PYBIND11_MODULE(_itree, m) {
       .def("set_as_non_monotonic", &Tree::set_as_non_monotonic,
            "mark it as non-monotonic")
       .def_readwrite("extra", &Tree::extra)
-      .def_readwrite("tree_id", &Tree::tree_id)
+      .def_readwrite("tid", &Tree::tid)
       .def_readwrite("root", &Tree::root)
       .def_readwrite("stk", &Tree::stk)
       .def_readwrite(

@@ -11,7 +11,6 @@ from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random
 
-
 class Node(_itree.Node):
     """Tree Node
 
@@ -30,22 +29,25 @@ class Node(_itree.Node):
     When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the time stamp can be stored in the extra dictionary.
     """
 
+def _consolidate(node: Node):
+    if isinstance(node, Node):
+        return _itree.consolidate(node)
+    return None
 
-
-class ITree(_itree.Tree):
+class Tree(_itree.Tree):
     """An interval tree"""
 
-    def __init__(self, tree_id=None, extra={}):
+    def __init__(self, tid=None, extra={}):
         """Constructor of Tree
 
         Args:
-            tree_id (str, optional): a unique id of the tree. Defaults to None.
+            tid (str, optional): a unique id of the tree. Defaults to None.
             extra (dict, optional): extra information of the tree. Defaults to {}.
         """
-        if tree_id is None:
-            tree_id = "{:08x}".format(random.getrandbits(32))
+        if tid is None:
+            tid = "{:08x}".format(random.getrandbits(32))
 
-        super(ITree, self).__init__(tree_id=tree_id, extra=extra)
+        super().__init__(tid=tid, extra=extra)
 
     def start(self, a, b, extra={}):
         self.discover(a, b, extra)
@@ -56,7 +58,7 @@ class ITree(_itree.Tree):
     def consolidate(self):
         if len(self.stk) > 1:
             return
-        self.root = _itree.consolidate(self.root)
+        self.root = _consolidate(self.root)
 
     def to_img(sf, filename=None, format="png", node_shape="record"):
         try:
@@ -75,7 +77,7 @@ class ITree(_itree.Tree):
         return filename
 
 
-class ForestBase(_itree.Forest):
+class Forest(_itree.Forest):
     """Forest is a collection of trees"""
 
     __metaclass__ = ABC

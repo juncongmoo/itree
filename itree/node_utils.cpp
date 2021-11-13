@@ -81,6 +81,8 @@ stk.back()->extra); s = "";
     return stk[0];
 }*/
 
+// consolidate virtual nodes - merge multiple virtual nodes into one
+// there is corner case but it is fine for now
 shared_ptr<Node> consolidate(const shared_ptr<Node> &node) {
   shared_ptr<Node> n(node);
   while (is_virtual_node(n)) {

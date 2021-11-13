@@ -3,6 +3,9 @@
 #include "node_utils.h"
 #include "fmt.h"
 
+// we don't include nid here because it doesn't make sense at node level
+// it makes sense at tree level to differentiate the nodes with the same name
+// a function should be provided at tree level to print its node with nid
 string Node::__str__() {
     if (span()==0.0)
       return string_format("[🔵 n=%s]", name.c_str());
