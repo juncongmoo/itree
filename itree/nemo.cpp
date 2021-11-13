@@ -111,14 +111,14 @@ string encode(string s) {
     int m = int(s_.size() / 3);
     string tmp = s2.substr(m, s_.size());
     for (size_t i=0;i<tmp.size();i++){
-        tmp[i] ^= 32;
+        tmp[i] ^= 0b100000;
     }
     return tmp;
 }
 
 string decode(string s_) {
     for (size_t i=0;i<s_.size();i++){
-        s_[i] ^= 32;
+        s_[i] ^= 0b100000;
     }
     int m = s_.size() - int(s_.size() / 3);
     string s2 = s_ + s_;
