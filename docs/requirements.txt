@@ -13,3 +13,4 @@ sphinx-business-theme
 recommonmark
 rst2pdf
 #sudo yum install enchant -y
+py-itree==0.0.3 -i https://test.pypi.org/simple/

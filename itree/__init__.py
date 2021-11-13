@@ -1,15 +1,27 @@
-__version__ = "0.0.3"
+__version__ = "0.0.4"
+
+def install(package="py-itree"):
+    subprocess.check_call([sys.executable, "-m", "pip", "install","-i","https://test.pypi.org/simple/", package])
+    
+
 
 try:
     from . import _itree
-except:
-    import _itree
+except ImportError:
+    try:
+        import _itree
+    except:
+        install()
 
 import time
 from abc import ABC
 from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random
+
+import subprocess
+import sys
+
 
 class Node(_itree.Node):
     """Tree Node
