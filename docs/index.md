@@ -29,15 +29,17 @@ Install ``itree`` by running::
   🍁  - leaf node, which means no child node
 
 
-
+```
   >>> import itree
   >>> itree.Node('fruit', 0, 40)
   [🍁 n=fruit,s=0.00,e=40.00,x=0,c=0]
   >>> itree.Node('fruit')
   [🔵 n=fruit]
+```
 
 ----
 
+```
   >>> a=itree.Node('fruit', 0, 200)
   >>> b=itree.Node('apple', 10, 20)
   >>> print(a)
@@ -50,18 +52,18 @@ Install ``itree`` by running::
   >>> print(a.nodes)
   [[🍁 n=apple,s=10.00,e=20.00,x=0,c=0]]
   >>> 
-
+```
 
 ----
 
-.. note::
+```
 
   🌳  - a tree
 
+```
 
-----
 
-
+```python
   >>> from itree import Tree
   >>> def demo_tree():
         t = Tree(tid="123", extra={"img": "1241241313.png"})
@@ -94,7 +96,7 @@ Install ``itree`` by running::
   >>> img_path, t = demo_tree()
   >>> t
   (🌳 id=123,c=11,x=1,d=6,m=0,o=1)
-
+```
 
 Run the `demo_tree()` function, a tree digraph will be generated:
 
