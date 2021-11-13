@@ -12,10 +12,11 @@ In computer science, an `interval tree` is a tree data structure to hold interva
 Install ``itree`` by running:
 
 ```bash
-  $ pip install py-itree
+  pip install py-itree
 ```
 ## Quick Start
 
+- Symbol For Node And Tree
 
 ```
   🟢  - normal node; 
