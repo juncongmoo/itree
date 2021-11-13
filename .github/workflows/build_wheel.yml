@@ -18,7 +18,7 @@ jobs:
         with:
           filters: |
             itree:
-              - 'itree/**'
+              - 'itree/itree/**'
 
       - uses: actions/setup-python@v2
         with:
@@ -50,7 +50,7 @@ jobs:
         with:
           filters: |
             itree:
-              - 'itree/**'
+              - 'itree/itree/**'
       - name: Download artifact
         if: steps.filter.outputs.itree == 'true'
         uses: actions/download-artifact@v2
