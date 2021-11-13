@@ -14,6 +14,8 @@ iTree - an Interval Tree library
    recipes
 
 
+In computer science, an `interval tree` is a tree data structure to hold intervals. Every node in `itree` has a `start` and `end` value.
+
 Installation
 ============
 
