@@ -1,4 +1,4 @@
-__version__ = "0.0.4"
+__version__ = "0.0.1"
 
 try:
     from . import _itree
@@ -6,7 +6,6 @@ except ImportError:
     import _itree
 
 import time
-from abc import ABC
 from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random

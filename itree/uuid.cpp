@@ -29,13 +29,13 @@ string get_dt() {
 }
 
 static const string now_dt = get_dt();
-const static int SZ = 10240;
+const static int SZ = 102400;
 static const size_t S_LEN = 16;
 static vector<string> cache = vector<string>(SZ, string(S_LEN, '0'));
 
 void gen() {
     // https://stackoverflow.com/questions/19515557/fast-generate-a-large-set-of-random-strings-from-number-and-alphabet
-    static const char alphabet[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    static const char alphabet[63] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     static random_device rd;
     static default_random_engine rng(rd());
