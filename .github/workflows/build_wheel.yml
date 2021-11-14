@@ -90,6 +90,8 @@ jobs:
         uses: pypa/gh-action-pypi-publish@master
         with:
           verbose: true
-          username: __token__
+          skip_existing: true
+          verify_metadata: true
+          user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/

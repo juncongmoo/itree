@@ -3,15 +3,15 @@
 #include <random>
 
 /*
-Python 3.8.10 (default, Sep 28 2021, 16:10:42)
+Python 3.8.10 (default, Sep 28 2020, 16:10:42)
 [GCC 9.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> import time, _hiq
->>> a=time.monotonic();_hiq.uuid();b=time.monotonic();
+>>> import time, _itree
+>>> a=time.monotonic();_itree.uuid();b=time.monotonic();
 '20211025Kyg1AXUCmEbVSObB'
 >>> (b-a)*1e6
 138.62783089280128
->>> a=time.monotonic();_hiq.uuid();b=time.monotonic();
+>>> a=time.monotonic();_itree.uuid();b=time.monotonic();
 '20211025imrQhq0tguhmI33Y'
 >>> (b-a)*1e6
 22.32613041996956
@@ -29,7 +29,7 @@ string get_dt() {
 }
 
 static const string now_dt = get_dt();
-const static int SZ = 1024;
+const static int SZ = 10240;
 static const size_t S_LEN = 16;
 static vector<string> cache = vector<string>(SZ, string(S_LEN, '0'));
 
