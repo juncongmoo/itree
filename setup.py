@@ -13,11 +13,11 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 def _get_tree_version():
     """Parse the version string from itree/__init__.py."""
-    with open(os.path.join(here, "itree", "__init__.py")) as f:
+    with open(os.path.join(here, "itree", "version.py")) as f:
         try:
             version_line = next(line for line in f if line.startswith("__version__"))
         except StopIteration:
-            raise ValueError("__version__ not defined in itree/__init__.py")
+            raise ValueError("__version__ not defined in itree/version.py")
         else:
             ns = {}
             exec(version_line, ns)  # pylint: disable=exec-used
@@ -95,7 +95,7 @@ class BuildCMakeExtension(build_ext.build_ext):
 
 
 VERSION = _get_tree_version()
-DESCRIPTION = "A Tree Library"
+DESCRIPTION = "A Interval Tree Library"
 
 setuptools.setup(
     name="py-itree",
