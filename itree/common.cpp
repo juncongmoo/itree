@@ -2,7 +2,8 @@
 #include "b64.h"
 #include <pybind11/eval.h>
 
-VS split(string s, const string &delimiter) {
+
+/*VS split(string s, const string &delimiter) {
     VS r;
     size_t pos = 0;
     while ((pos = s.find(delimiter)) != string::npos) {
@@ -25,7 +26,6 @@ vector<char> str_to_vc(const string &s) {
     return vc;
 }
 
-/*
 string dict_to_b64_str(map<string, string> &m) {
     string buffer = map_to_string(m);
     return Base64::Encode(&buffer[0], buffer.size());
@@ -35,7 +35,7 @@ map<string, string> b64_str_to_dict(const string &s) {
     string out;
     Base64::Decode(s, out);
     return str_to_map(out);
-}*/
+}
 
 std::string _strip(const std::string &s) {
     auto start_it = s.begin();
@@ -67,7 +67,7 @@ void _write(std::stringstream &ss, std::string &str) {
     ss.write((char *)(str.data()), str.length());
 }
 
-/*
+
 string map_to_string(const map<string, string> &m) {
     std::stringstream ss;
     for (auto &i : m) {
@@ -89,8 +89,7 @@ map<string, string> str_to_map(const string &s) {
         m[key] = value;
     }
     return m;
-}
-*/
+}*/
 
 void update_dict(py::dict &a, const py::dict &b) {
     for (const auto &item : b) {
