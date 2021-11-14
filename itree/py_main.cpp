@@ -21,12 +21,12 @@ string get_time() {
 
 PYBIND11_MODULE(_itree, m) {
   m.doc() = R"--(
-    iTree (A Tree Library exclusively for structural time series data)
+    iTree (A Interval Tree Library for structural time series data)
 
     iTree is a high performance nary Interval Tree library designed for structural time series data.
 
     )--";
-  m.ver() = "1.0.0";
+  m.ver() = "0.0.1";
   m.author() = "Juncong Moo";
   m.date() = "2021-06-01";
   m.credits() = "Wendy Lee";
