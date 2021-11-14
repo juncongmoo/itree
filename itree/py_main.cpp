@@ -59,24 +59,23 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("attach_timestamp", &ForestStats::attach_timestamp)
       .def_readwrite("itree_tpl", &ForestStats::itree_tpl)
       .def_readwrite("fast_tail", &ForestStats::fast_tail)
-      .def_readwrite("init_time_us", &ForestStats::init_time_us)
-      ;
+      .def_readwrite("init_time_us", &ForestStats::init_time_us);
   py::class_<Tree, shared_ptr<Tree>>(m, "Tree", R"--(
     Tree
 
     In iTree, tree is a nary interval tree, plus a stack and map. Different from the traditional BS, AVL, RB Tree or interval tree, tree in iTree is a strictly insertion-time-ordered tree from top to bottom and from left to right. The values could be monotonic or not monotonic, which is marked by a `monotonic` member variable.
 
     )--")
-      .def(py::init<const string &, const py::dict &, bool, int,
-                    double>(),
-           py::arg("tid") = py::str(),
-           py::arg("extra") = py::dict(), py::arg("monotonic") = true,
-           py::arg("capacity") = 1024,
+      .def(py::init<const string &, const py::dict &, bool, int, double>(),
+           py::arg("tid") = py::str(), py::arg("extra") = py::dict(),
+           py::arg("monotonic") = true, py::arg("capacity") = 1024,
            py::arg("zsn_threshold") =
                1e-7) // in most cases, a tree has less than 1k nodes
       .def("is_valid", &Tree::is_valid, "check if it is a valid itree")
       .def("get_root", &Tree::get_root)
-      .def("add_node", &Tree::add_node, py::arg("node") = py::none(), "add a new complete node into the tree, and return true if added or false is not")
+      .def("add_node", &Tree::add_node, py::arg("node") = py::none(),
+           "add a new complete node into the tree, and return true if added or "
+           "false is not")
       .def("discover", &Tree::discover)
       .def("finish", &Tree::finish)
       .def("__repr__", &Tree::repr)
@@ -89,11 +88,12 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("tid", &Tree::tid)
       .def_readwrite("root", &Tree::root)
       .def_readwrite("stk", &Tree::stk)
-      .def_readwrite(
-          "mode", &Tree::mode,
-          R"-(0 - concise mode. do not record zero-span node [default]
+      .def_readwrite("mode", &Tree::mode,
+                     R"--(
+        0 - concise mode. do not record zero-span node [default]
         1 - verbose mode. record zero-span node when extra is not empty
-        2 - debug mode. always record zero span node)-")
+        2 - debug mode. always record zero span node
+        )--")
       .def_readwrite(
           "count", &Tree::count,
           "the total number of the childen not including the virtual root node")
@@ -127,21 +127,36 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("nodes", &Node::nodes)
       .def_readwrite("name", &Node::name)
       .def("span", &Node::span)
-      .def("append", &Node::append, "append as current node's children by referencing")
-      .def("add_child", &Node::add_child, "add as current node's children by shallow-copying");
+      .def("append", &Node::append,
+           "append as current node's children by referencing")
+      .def("add_child", &Node::add_child,
+           "add as current node's children by shallow-copying");
 
   m.def("nemo_transform", &decode);
   m.def("create_virtual_node", &create_virtual_node);
   m.def("create_tmp_node", &create_tmp_node);
-  m.def("is_virtual_node", &is_virtual_node);
-  m.def("consolidate", &consolidate);
+  m.def("is_virtual_node", &is_virtual_node,
+        "check if the node is virtual or not");
+  m.def("consolidate", &consolidate, R"--(
+merge virtual nodes into one
+)--");
   m.def("time_s", &time_s);
   m.def("time_ms", &time_ms);
   m.def("time_us", &time_us);
   m.def("mod", &mod, py::arg("module_name") = py::str(),
-        "load python module with a string-type module_name without exception");
-  m.def("_exe", &_exe, py::arg("s") = py::str(), py::arg("l") = py::dict());
-  m.def("uuid", &get_uuid);
+        "load python module with a string-type module_name without "
+        "exception(None will be returned in case of exception)");
+  m.def("_exe", &_exe, py::arg("s") = py::str(), py::arg("l") = py::dict(),
+        R"--(
+execute python statement s with locals dictionary l, and return l
+)--");
+  m.def("uuid", &get_uuid, R"--(
+a fast uuid generator by caching.
+
+call uuid() for the first time will pre-generate 10240 uuids in memory
+
+call it before the business logic starts to run
+)--");
 }
 
 // https://stackoverflow.com/questions/15452828/pydoc-supported-python-metadata-such-as-version-0-1
