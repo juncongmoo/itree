@@ -4,7 +4,7 @@
 
 using namespace std;
 
-struct PYBIND11_EXPORT Forest {
+struct PYBIND11_EXPORT ForestStats {
   long long init_time_us;
   // disk I / O
   long long dio_bytes_r = 0;
@@ -19,7 +19,7 @@ struct PYBIND11_EXPORT Forest {
   long long nio_bytes_w = 0;
 
   // latency overhead in microseconds
-  long long overhead_us;
+  long long overhead_us = 0;
 
   // tracing enabled
   bool enabled = false;
@@ -34,6 +34,13 @@ struct PYBIND11_EXPORT Forest {
   // exception
   bool fast_tail = false;
 
+  // forest is a dict of: id -> name -> Tree
+  // in child class, you can use: self.forest = defaultdict(dict, self.forest)
+  py::dict forest = py::dict();
+
+  // constructor
+  ForestStats() : init_time_us(time_us()), overhead_us(0) {}
+
   void load_tpl(const string &template_path) {
     if (!template_path.empty()) {
       ifstream t(template_path);
@@ -44,8 +51,6 @@ struct PYBIND11_EXPORT Forest {
   }
 
   // metric function
-
-  Forest() : init_time_us(time_us()), overhead_us(0) {}
   inline long long get_dio_bytes_r() { return dio_bytes_r; }
   inline long long get_dio_bytes_w() { return dio_bytes_w; }
   inline long long get_sio_bytes_r() { return sio_bytes_r; }

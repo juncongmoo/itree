@@ -1,4 +1,4 @@
-#include "forest.h"
+#include "forest_stats.h"
 #include "nemo.h"
 #include "node.h"
 #include "shared.h"
@@ -21,45 +21,45 @@ string get_time() {
 
 PYBIND11_MODULE(_itree, m) {
   m.doc() = R"--(
-    iTree (Yet Another Tree Library exclusively for structural time series data)
+    iTree (A Tree Library exclusively for structural time series data)
 
-    iTree is a high performance nary Interval Tree library designed exclusively for structural time series data.
+    iTree is a high performance nary Interval Tree library designed for structural time series data.
 
     )--";
   m.ver() = "1.0.0";
   m.author() = "Juncong Moo";
   m.date() = "2021-06-01";
   m.credits() = "Wendy Lee";
-  py::class_<Forest>(m, "Forest", R"--(
-    Forest
+  py::class_<ForestStats>(m, "ForestStats", R"--(
+    ForestStats
 
-    Forest contains many trees. It is a map like data structure to store all the structural time series data and cache data.
+    ForestStats contains many trees for system statistics collection.
+    It is a map like data structure to store all the structural time series data and cache data.
     The mapping relation is defined as:
         id => key => interval tree
 
     )--")
 
       .def(py::init<>())
-      .def("load_tpl", &Forest::load_tpl)
-      .def("get_dio_bytes_r", &Forest::get_dio_bytes_r)
-      .def("get_dio_bytes_w", &Forest::get_dio_bytes_w)
-      .def("get_sio_bytes_r", &Forest::get_sio_bytes_r)
-      .def("get_sio_bytes_w", &Forest::get_sio_bytes_w)
-      .def("get_nio_bytes_r", &Forest::get_nio_bytes_r)
-      .def("get_nio_bytes_w", &Forest::get_nio_bytes_w)
-      .def_readwrite("dio_bytes_r", &Forest::dio_bytes_r)
-      .def_readwrite("dio_bytes_w", &Forest::dio_bytes_w)
-      .def_readwrite("sio_bytes_r", &Forest::sio_bytes_r)
-      .def_readwrite("sio_bytes_w", &Forest::sio_bytes_w)
-      .def_readwrite("nio_bytes_r", &Forest::nio_bytes_r)
-      .def_readwrite("nio_bytes_w", &Forest::nio_bytes_w)
-      .def_readwrite("overhead_us", &Forest::overhead_us)
-      .def_readwrite("enabled", &Forest::enabled)
-      .def_readwrite("attach_timestamp", &Forest::attach_timestamp)
-      .def_readwrite("itree_tpl", &Forest::itree_tpl)
-      .def_readwrite("fast_tail", &Forest::fast_tail)
-      .def_readwrite("init_time_us", &Forest::init_time_us)
-      //.def("deserialize", &Tree::deserialize)
+      .def("load_tpl", &ForestStats::load_tpl)
+      .def("get_dio_bytes_r", &ForestStats::get_dio_bytes_r)
+      .def("get_dio_bytes_w", &ForestStats::get_dio_bytes_w)
+      .def("get_sio_bytes_r", &ForestStats::get_sio_bytes_r)
+      .def("get_sio_bytes_w", &ForestStats::get_sio_bytes_w)
+      .def("get_nio_bytes_r", &ForestStats::get_nio_bytes_r)
+      .def("get_nio_bytes_w", &ForestStats::get_nio_bytes_w)
+      .def_readwrite("dio_bytes_r", &ForestStats::dio_bytes_r)
+      .def_readwrite("dio_bytes_w", &ForestStats::dio_bytes_w)
+      .def_readwrite("sio_bytes_r", &ForestStats::sio_bytes_r)
+      .def_readwrite("sio_bytes_w", &ForestStats::sio_bytes_w)
+      .def_readwrite("nio_bytes_r", &ForestStats::nio_bytes_r)
+      .def_readwrite("nio_bytes_w", &ForestStats::nio_bytes_w)
+      .def_readwrite("overhead_us", &ForestStats::overhead_us)
+      .def_readwrite("enabled", &ForestStats::enabled)
+      .def_readwrite("attach_timestamp", &ForestStats::attach_timestamp)
+      .def_readwrite("itree_tpl", &ForestStats::itree_tpl)
+      .def_readwrite("fast_tail", &ForestStats::fast_tail)
+      .def_readwrite("init_time_us", &ForestStats::init_time_us)
       ;
   py::class_<Tree, shared_ptr<Tree>>(m, "Tree", R"--(
     Tree
@@ -140,10 +140,8 @@ PYBIND11_MODULE(_itree, m) {
   m.def("time_us", &time_us);
   m.def("mod", &mod, py::arg("module_name") = py::str(),
         "load python module with a string-type module_name without exception");
-  // m.def("mod2", &mod2);
   m.def("_exe", &_exe, py::arg("s") = py::str(), py::arg("l") = py::dict());
   m.def("uuid", &get_uuid);
-  // m.def("deserialize", &deserialize);
 }
 
 // https://stackoverflow.com/questions/15452828/pydoc-supported-python-metadata-such-as-version-0-1

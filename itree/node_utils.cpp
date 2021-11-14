@@ -5,6 +5,15 @@
 
 static const double inf = std::numeric_limits<double>::infinity();
 
+/*
+Virtual node is a special node which has name None, start and end values equal
+to infinity. You can use create_virtual_node to create a virtual node. It’s
+useful when there are multiple trees and they need to be represented as one
+tree.
+
+In case there are multiple virtual nodes, call consolidate(node) to merge
+the virtual nodes into one.
+*/
 shared_ptr<Node> create_virtual_node() {
   py::dict m = {};
   return make_shared<Node>(VNODE_NAME, inf, inf, m);

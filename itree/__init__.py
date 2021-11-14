@@ -81,7 +81,7 @@ class Tree(_itree.Tree):
         return filename
 
 
-# Forest is a collection of trees
-Forest=_itree.Forest
+# ForestStats is a collection of trees
+ForestStats=_itree.ForestStats
 
 

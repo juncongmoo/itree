@@ -31,7 +31,7 @@ In case there are multiple virtual nodes, call `itree.consolidate(node)` to merg
 
 
 
- .. autoclass:: itree.Forest
+ .. autoclass:: itree.ForestStats
 
 ```
 
