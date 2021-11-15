@@ -10,23 +10,19 @@ from subprocess import check_call
 from tempfile import NamedTemporaryFile
 import random
 
-class Node(_itree.Node):
-    """Tree Node
-
-    Node is a nary interval tree node with the following member variables:
-
-    .. highlight:: python
-    .. code-block:: python
-
-        nid - node id, unique in a tree
-        name - node name
-        start - start value
-        end - end value
-        extra - a dictionary of extra information
-        nodes - children of the current node
-
-    When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the time stamp can be stored in the extra dictionary.
-    """
+"""
+Node is a nary interval tree node with the following member variables:
+.. highlight:: python
+.. code-block:: python
+    nid - node id, unique in a tree
+    name - node name
+    start - start value
+    end - end value
+    extra - a dictionary of extra information
+    nodes - children of the current node
+When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the timestamp can be stored in the extra dictionary.
+"""
+Node = _itree.Node
 
 def _consolidate(node: Node):
     if isinstance(node, Node):
@@ -92,3 +88,4 @@ time_s = _itree.time_s
 time_ms = _itree.time_ms
 time_us = _itree.time_us
 is_virtual_node = _itree.is_virtual_node
+create_virtual_node = _itree.create_virtual_node
