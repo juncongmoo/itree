@@ -32,7 +32,7 @@ def _consolidate(node: Node):
 class Tree(_itree.Tree):
     """An interval tree"""
 
-    def __init__(self, tid=None, extra={}):
+    def __init__(self, tid=None, extra={}, monotonic=True, capacity=1024, zsn_threshold=1e-7):
         """Constructor of Tree
 
         Args:
@@ -42,7 +42,7 @@ class Tree(_itree.Tree):
         if tid is None:
             tid = "{:08x}".format(random.getrandbits(32))
 
-        super().__init__(tid=tid, extra=extra)
+        super().__init__(tid=tid, extra=extra, monotonic=monotonic, capacity=capacity, zsn_threshold=zsn_threshold)
 
     def start(self, a, b, extra={}):
         """discover a node with name `a` and value `b`, and extra"""
