@@ -32,7 +32,7 @@ struct PYBIND11_EXPORT ForestStats {
 
     // when not populating exceptions and exception happens, do not swallow the
     // exception
-    bool fast_tail = false;
+    bool fast_fail = false;
 
     // forest is a dict of: id -> name -> Tree
     // in child class, you can use: self.forest = defaultdict(dict, self.forest)

@@ -2,6 +2,16 @@
 #include "b64.h"
 #include <pybind11/eval.h>
 
+string str_to_b64(const string &s) {
+    return Base64::Encode(&s[0], s.size());
+}
+
+string b64_to_str(const string &s) {
+    string out;
+    Base64::Decode(s, out);
+    return out;
+}
+
 /*VS split(string s, const string &delimiter) {
     VS r;
     size_t pos = 0;
@@ -149,4 +159,13 @@ vector<string> split(string str, const string& token, int max_) {
         }
     }
     return result;
+}
+
+int _stoi(const string &s, const string& d){
+    try {
+        return stoi(s);
+    }catch (const std::exception & e){
+        cout << __FUNCTION__ << "," << __LINE__ << "," << d << ": " << e.what() << endl;
+        return 0;
+    }
 }

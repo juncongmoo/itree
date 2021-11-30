@@ -61,7 +61,7 @@ PYBIND11_MODULE(_itree, m) {
         .def_readwrite("enabled", &ForestStats::enabled)
         .def_readwrite("attach_timestamp", &ForestStats::attach_timestamp)
         .def_readwrite("itree_tpl", &ForestStats::itree_tpl)
-        .def_readwrite("fast_tail", &ForestStats::fast_tail)
+        .def_readwrite("fast_fail", &ForestStats::fast_fail)
         //.def_readwrite("forest", &ForestStats::forest)
         .def_readwrite("init_time_us", &ForestStats::init_time_us)
         .def(py::pickle(

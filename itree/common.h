@@ -35,4 +35,7 @@ py::dict _exe(const string &, py::dict &l);
 string get_uuid();
 
 vector<string> split(string str, const string& token, int max_ = INT_MAX);
+int _stoi(const string&, const string&);
+string str_to_b64(const string &s);
+string b64_to_str(const string &s);
 #endif

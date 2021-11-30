@@ -4,7 +4,8 @@ namespace py = pybind11;
 using namespace std;
 using namespace pybind11::literals;
 
-const static auto ast = py::module::import("ast");
+// this will cause core dump
+// const static auto ast = py::module::import("ast");
 
 py::str run_length_dict(const py::dict &d) {
     if (d.empty())
@@ -15,6 +16,7 @@ py::str run_length_dict(const py::dict &d) {
 }
 
 py::dict str_to_dict(const string &dict_str) {
+    auto ast = py::module::import("ast");
     auto vs = split(dict_str, "#");
     return ast.attr("literal_eval")(vs[1]);
 }
@@ -68,6 +70,7 @@ shared_ptr<Node> deserialize_node_(py::str bs) {
 }
 
 shared_ptr<Node> deserialize_node_impl(const string &d) {
+    auto ast = py::module::import("ast");
     vector<shared_ptr<Node>> stk_ = {create_virtual_node_()};
     // auto ss = "{'name': 'World', 'number': 42, 'x': {'name': 'W', 'number': 4}}";
     // py::dict z = ast.attr("literal_eval")(ss);
@@ -163,7 +166,7 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
 }
 
 py::str serialize_forest_(const ForestStats &fr) {
-    py::str s = "f1^{},{},{},{},{},{},{},{},{},{},{},{}"_s.format(fr.init_time_us,
+    py::str s = "f1^{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}"_s.format(fr.init_time_us,
                                                                   fr.dio_bytes_r,
                                                                   fr.dio_bytes_w,
                                                                   fr.sio_bytes_r,
@@ -174,7 +177,7 @@ py::str serialize_forest_(const ForestStats &fr) {
                                                                   int(fr.enabled),
                                                                   int(fr.attach_timestamp),
                                                                   fr.itree_tpl,
-                                                                  int(fr.fast_tail));
+                                                                  int(fr.fast_fail));
     return s;
 }
 
@@ -183,7 +186,7 @@ ForestStats deserialize_forest_(const py::str &bs) {
     // py::print(bs);
     string d = static_cast<std::string>(bs);
     auto v1 = split(d, "^", 1);
-    auto v2 = split(v1[1], ",");
+    auto v2 = split(v1[1], "\1");
     // py::print("v2:", v2[0], v2[1], v2[2], v2[3], v2[4], v2[5], v2[6], v2[7], v2[8], v2[9], v2[10], v2[11]);
     fr.init_time_us = stoll(v2[0]);
     fr.dio_bytes_r = stoll(v2[1]);
@@ -196,6 +199,6 @@ ForestStats deserialize_forest_(const py::str &bs) {
     fr.enabled = stoi(v2[8]);
     fr.attach_timestamp = stoi(v2[9]);
     fr.itree_tpl = v2[10];
-    fr.fast_tail = stoi(v2[11]);
+    fr.fast_fail = stoi(v2[11]);
     return fr;
 }
