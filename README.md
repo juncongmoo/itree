@@ -91,7 +91,9 @@ Run the `demo_tree()` function, a tree digraph will be generated:
 
 The green circle node is a virtual node. The yellow record box is the node with max interval.
 
-## Run Tests
+## Development
+
+- Test
 
 ```bash
 $python -m unittest discover
@@ -100,6 +102,20 @@ $python -m unittest discover
 Ran 15 tests in 1.209s
 
 OK
+```
+
+- Format
+
+```bash
+find itree -iname *.h -o -iname *.cpp | xargs clang-format -i
+black -S . --exclude '(gcc|infer|\.history|workspace|vendor|\.vscode|\.git|\.VSCodeCounter|img|venv|.ansible|.cache|.local|.vim)'
+```
+
+- Build
+
+```bash
+rm -fr itree/build/ && ./release.sh && yes | cp itree/build/_itree.* itree/
+pip install --editable .
 ```
 
 ## License

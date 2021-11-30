@@ -1,6 +1,6 @@
 // https://pybind11.readthedocs.io/en/stable/advanced/embedding.html
-#include "shared.h"
 #include "nemo.h"
+#include "shared.h"
 #include "tree.h"
 #include <pybind11/embed.h> // <= You need this header
 
@@ -19,7 +19,7 @@ void test_tree() {
     auto ast = py::module::import("ast");
     auto z = ast.attr("literal_eval")(y);
 
-    //auto z = y.cast<py::dict>();
+    // auto z = y.cast<py::dict>();
     py::print(kwargs.cast<py::str>());
     py::print(z);
     // Tree t("", "None", extra, false);

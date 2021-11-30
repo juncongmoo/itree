@@ -30,41 +30,39 @@ def demo_tree():
     t.end("root", 1628400570.8713503)
     return t
 
+
 def demo_forest():
     f = itree.ForestStats()
     return f
-    
+
 
 class TestPicklable(unittest.TestCase):
-
     def test_picklable_node(self):
         fruit = itree.Node('fruit')
 
         self.assertTrue(itree.is_picklable(fruit))
-        
-        apple = itree.Node('apple',0,1,{"x":1})
+
+        apple = itree.Node('apple', 0, 1, {"x": 1})
         self.assertTrue(itree.is_picklable(apple))
-        
+
         fruit.append(apple)
         self.assertTrue(itree.is_picklable(fruit))
-        fruit.end=100
+        fruit.end = 100
         self.assertTrue(itree.is_picklable(fruit))
-        
-        
-        pear = itree.Node('pear',4,5,{"x":4})
+
+        pear = itree.Node('pear', 4, 5, {"x": 4})
         fruit.append(pear)
         self.assertTrue(itree.is_picklable(pear))
         self.assertTrue(itree.is_picklable(fruit))
-        
 
         d1 = pickle.dumps(fruit)
         f2 = pickle.loads(d1)
         d2 = pickle.dumps(f2)
         self.assertEqual(str(fruit), str(f2))
         self.assertEqual(d1, d2)
-        #print("*"*40)
-        #print(d1, "\n", d2)
-        #print("*"*40)
+        # print("*"*40)
+        # print(d1, "\n", d2)
+        # print("*"*40)
 
     def test_picklable_tree(self):
         t1 = demo_tree()
@@ -73,7 +71,7 @@ class TestPicklable(unittest.TestCase):
         d2 = pickle.dumps(t2)
         self.assertEqual(d1, d2)
         self.assertEqual(str(t1), str(t2))
-        #print(d1, "\n", d2)
+        # print(d1, "\n", d2)
 
     def test_forest(self):
         f1 = demo_forest()
@@ -82,9 +80,8 @@ class TestPicklable(unittest.TestCase):
         d2 = pickle.dumps(f2)
         self.assertEqual(d1, d2)
         self.assertEqual(f1.init_time_us, f2.init_time_us)
-        #print(d1, "\n", d2)
+        # print(d1, "\n", d2)
+
 
 if __name__ == '__main__':
     unittest.main()
-
-

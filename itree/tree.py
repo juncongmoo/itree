@@ -16,7 +16,7 @@ class Tree(_itree.Tree):
     """An interval tree"""
 
     def __init__(
-        self, tid=None, extra={}, monotonic=True, capacity=1024, zsn_threshold=1e-7
+        self, tid=None, extra={}, monotonic=True, capacity=1024, zin_threshold=1e-7
     ):
         """Constructor of Tree
 
@@ -32,7 +32,7 @@ class Tree(_itree.Tree):
             extra=extra,
             monotonic=monotonic,
             capacity=capacity,
-            zsn_threshold=zsn_threshold,
+            zin_threshold=zin_threshold,
         )
 
     def start(self, a, b, extra={}):
@@ -65,6 +65,3 @@ class Tree(_itree.Tree):
             print("dot is missing! please install graphviz.")
             return None
         return filename
-
-    
-

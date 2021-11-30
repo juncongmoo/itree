@@ -15,29 +15,27 @@ In case there are multiple virtual nodes, call consolidate(node) to merge
 the virtual nodes into one.
 */
 shared_ptr<Node> create_virtual_node() {
-  py::dict m = {};
-  return make_shared<Node>(VNODE_NAME, inf, inf, m);
+    py::dict m = {};
+    return make_shared<Node>(VNODE_NAME, inf, inf, m);
 }
 
 shared_ptr<Node> create_tmp_node() {
-  py::dict m = {};
-  return make_shared<Node>("", 0, 0, m);
+    py::dict m = {};
+    return make_shared<Node>("", 0, 0, m);
 }
 
 string str_to_lower(const string &s) {
-  string data(s);
-  transform(data.begin(), data.end(), data.begin(),
-            [](unsigned char c) { return tolower(c); });
-  return data;
+    string data(s);
+    transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return tolower(c); });
+    return data;
 }
 
 bool is_virtual_node(const shared_ptr<Node> &n) {
-  // auto a = to_string(n->start);
-  // auto b = to_string(n->end);
-  // string lower_name = str_to_lower(n->name);
-  return ((n->start == inf and n->end == inf) or
-          (n->start == -inf and n->end == inf) or
-          (n->start == inf and n->end == -inf));
+    // auto a = to_string(n->start);
+    // auto b = to_string(n->end);
+    // string lower_name = str_to_lower(n->name);
+    return ((n->start == inf and n->end == inf) or (n->start == -inf and n->end == inf)
+            or (n->start == inf and n->end == -inf));
 }
 
 /*void __parse_node(const string &s, double &start, double &end, py::dict
@@ -93,45 +91,47 @@ stk.back()->extra); s = "";
 // consolidate virtual nodes - merge multiple virtual nodes into one
 // there is corner case but it is fine for now
 shared_ptr<Node> consolidate(const shared_ptr<Node> &node) {
-  shared_ptr<Node> n(node);
-  while (is_virtual_node(n)) {
-    if (n->nodes.size() == 1 and is_virtual_node(n->nodes.front())) {
-      n = n->nodes.front();
-    } else {
-      break;
+    shared_ptr<Node> n(node);
+    while (is_virtual_node(n)) {
+        if (n->nodes.size() == 1 and is_virtual_node(n->nodes.front())) {
+            n = n->nodes.front();
+        } else {
+            break;
+        }
     }
-  }
 
-  if (is_virtual_node(n) and !n->nodes.empty()) {
-    for (const auto &e : n->nodes) {
-      if (n->start == inf or n->start == -inf) {
-        n->start = e->start;
-      } else {
-        n->start = min(n->start, e->start);
-      }
-      if (n->end == inf or n->end == -inf) {
-        n->end = e->end;
-      } else
-        n->end = max(n->end, e->end);
+    if (is_virtual_node(n) and !n->nodes.empty()) {
+        for (const auto &e : n->nodes) {
+            if (n->start == inf or n->start == -inf) {
+                n->start = e->start;
+            } else {
+                n->start = min(n->start, e->start);
+            }
+            if (n->end == inf or n->end == -inf) {
+                n->end = e->end;
+            } else
+                n->end = max(n->end, e->end);
+        }
     }
-  }
-  return n;
+    return n;
 }
 
-void __dfs(const shared_ptr<Node> &n, unordered_set<string> &x,
-           unordered_map<string, VS> &y, string &max_leaf_node_name,
+void __dfs(const shared_ptr<Node> &n,
+           unordered_set<string> &x,
+           unordered_map<string, VS> &y,
+           string &max_leaf_node_name,
            double &max_interval) {
-  x.insert(n->name);
-  if (n->nodes.empty()) {
-    if (n->span() > max_interval) {
-      max_leaf_node_name = n->name;
-      max_interval = n->span();
+    x.insert(n->name);
+    if (n->nodes.empty()) {
+        if (n->span() > max_interval) {
+            max_leaf_node_name = n->name;
+            max_interval = n->span();
+        }
     }
-  }
-  for (const auto &e : n->nodes) {
-    y[n->name].push_back(e->name);
-    __dfs(e, x, y, max_leaf_node_name, max_interval);
-  }
+    for (const auto &e : n->nodes) {
+        y[n->name].push_back(e->name);
+        __dfs(e, x, y, max_leaf_node_name, max_interval);
+    }
 }
 
 /*
@@ -156,42 +156,43 @@ style="filled" fillcolor="red"]; "piggy"; "icecream"; "l1"; "egg"; "unicorn" ->
 }
 */
 string to_dot_string(const shared_ptr<Node> &root, const string &node_shape) {
-  string s = "digraph tree{\n";
-  s += string_format("\tnode [shape=%s margin=0 fontcolor=blue fontsize=9 "
-                     "width=0.5 style=filled]"
-                     "\n\tedge [fontsize=8]"
-                     "\n\trankdir=LR\n\n",
-                     node_shape.c_str());
-  unordered_set<string> node_names;
-  unordered_map<string, VS> successors;
-  double max_interval = -2147483648.0;
-  string max_leaf_node_name = root->name;
-  __dfs(root, node_names, successors, max_leaf_node_name, max_interval);
-  for (const auto &e : node_names) {
-    if (e.substr(0, 4) == VNODE_NAME) {
-      s += "\t\"+\" [shape=\"doublecircle\" color=\"orange\" style=\"filled\" "
-           "fillcolor=\"green\"]";
-    } else {
-      s += string_format("\t\"%s\"", e.c_str());
-      if (e == max_leaf_node_name) {
-        string label = string_format("[shape=record color=green style=filled "
-                                     "fillcolor=yellow label=\"%s | "
-                                     "%.6f \"]",
-                                     max_leaf_node_name.c_str(), max_interval);
-        s += label;
-      }
-    }
+    string s = "digraph tree{\n";
+    s += string_format("\tnode [shape=%s margin=0 fontcolor=blue fontsize=9 "
+                       "width=0.5 style=filled]"
+                       "\n\tedge [fontsize=8]"
+                       "\n\trankdir=LR\n\n",
+                       node_shape.c_str());
+    unordered_set<string> node_names;
+    unordered_map<string, VS> successors;
+    double max_interval = -2147483648.0;
+    string max_leaf_node_name = root->name;
+    __dfs(root, node_names, successors, max_leaf_node_name, max_interval);
+    for (const auto &e : node_names) {
+        if (e.substr(0, 4) == VNODE_NAME) {
+            s += "\t\"+\" [shape=\"doublecircle\" color=\"orange\" style=\"filled\" "
+                 "fillcolor=\"green\"]";
+        } else {
+            s += string_format("\t\"%s\"", e.c_str());
+            if (e == max_leaf_node_name) {
+                string label = string_format("[shape=record color=green style=filled "
+                                             "fillcolor=yellow label=\"%s | "
+                                             "%.6f \"]",
+                                             max_leaf_node_name.c_str(),
+                                             max_interval);
+                s += label;
+            }
+        }
 
-    s += ";\n";
-  }
-  for (const auto &e : successors) {
-    for (const auto &v : e.second) {
-      if (e.first.substr(0, 4) == VNODE_NAME) {
-        s += string_format("\t\"+\" -> \"%s\";\n", v.c_str());
-      } else
-        s += string_format("\t\"%s\" -> \"%s\";\n", e.first.c_str(), v.c_str());
+        s += ";\n";
     }
-  }
-  s += "}";
-  return s;
+    for (const auto &e : successors) {
+        for (const auto &v : e.second) {
+            if (e.first.substr(0, 4) == VNODE_NAME) {
+                s += string_format("\t\"+\" -> \"%s\";\n", v.c_str());
+            } else
+                s += string_format("\t\"%s\" -> \"%s\";\n", e.first.c_str(), v.c_str());
+        }
+    }
+    s += "}";
+    return s;
 }

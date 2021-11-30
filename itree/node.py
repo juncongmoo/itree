@@ -5,21 +5,28 @@ import ast
 from typing import Union
 
 
-def serialize_node(n, s: str = ""):
-    """serialize_node a Node to string"""
-    if n:
-        extra_ = "0#"
-        if n.extra:
-            extra_ = str(n.extra)
-            extra_ = f"{len(extra_)}#{extra_}"
-        s += "{" + f"{n.name},{n.start},{n.end},{n.nid}${extra_}"
-        for i in n.nodes:
-            s = serialize_node(i, s)
-        s += "}"
-    return s
+def serialize_node(n):
+    s = "n1*"
 
-#Node = _itree.Node
-#create_virtual_node = _itree.create_virtual_node
+    def __f(n, s: str = ""):
+        """serialize_node a Node to string"""
+        if n:
+            extra_ = "0#"
+            if n.extra:
+                extra_ = str(n.extra)
+                extra_ = f"{len(extra_)}#{extra_}"
+            s += "[" + f"{n.name},{n.start},{n.end},{n.nid}${extra_}"
+            for i in n.nodes:
+                s = __f(i, s)
+            s += "]"
+        return s
+
+    return __f(n, s)
+
+
+# Node = _itree.Node
+# create_virtual_node = _itree.create_virtual_node
+
 
 class Node(_itree.Node):
     """
@@ -34,6 +41,7 @@ class Node(_itree.Node):
         nodes - children of the current node
     When value is time itself, the start and end are timestamps. When value is not time, for instance network traffic, the timestamp can be stored in the extra dictionary.
     """
+
     def __init__(self, name="", start=0.0, end=0.0, extra=None, nid=0, node=None):
         if extra is None:
             extra = {}
@@ -66,9 +74,9 @@ class Node(_itree.Node):
         self.nodes = t.nodes
     """
 
+
 def create_virtual_node() -> Node:
     return Node(node=_itree.create_virtual_node())
-
 
 
 def _consolidate(node: Node):
@@ -78,9 +86,6 @@ def _consolidate(node: Node):
             return n.nodes[0]
         return n
     return None
-
-
-
 
 
 def __create_tmp_node():
@@ -100,12 +105,17 @@ def deserialize_node(bs: str):
         return None
     if isinstance(bs, bytes):
         bs = bs.decode("utf-8")
+    assert bs[0] == 'n', "data format error"
+    i = bs.index('*')
+    version = int(bs[1:i])
+    bs = bs[i + 1 :]
+
     stk_ = [create_virtual_node()]
     s = ""
     i = 0
     while i < len(bs):
         ch = bs[i]
-        if ch == "{":
+        if ch == "[":
             if len(stk_) == 1:
                 stk_.append(__create_tmp_node())
                 stk_[0].append(stk_[1])
@@ -129,7 +139,7 @@ def deserialize_node(bs: str):
                     stk_[-1].extra = ast.literal_eval(remaining[:extra_len])
                 i += extra_len + 1 + len(extra_len_str) + 1
                 continue
-        elif ch == "}":
+        elif ch == "]":
             assert not s, "s should be empty"
             if len(stk_) > 1:
                 stk_.pop()
@@ -141,24 +151,24 @@ def deserialize_node(bs: str):
     r = _consolidate(stk_[0])
     if isinstance(r, _itree.Node):
         r = Node(node=r)
-    #print(r)
+    # print(r)
     return r
-
 
 
 if __name__ == '__main__':
     import pickle
+
     """
     s="{fruit,0.0,100.0,0$0#{apple,0.0,1.0,0$8#{'x': 1}}{pear,4.0,5.0,0$8#{'x': 4}}}"
     nn = deserialize_node(s)
     print(nn)"""
-    
+
     fruit = itree.Node('fruit')
 
-    apple = itree.Node('apple',0,1,{"x":1})
+    apple = itree.Node('apple', 0, 1, {"x": 1})
     fruit.append(apple)
-    fruit.end=100
-    pear = itree.Node('pear',4,5,{"x":4})
+    fruit.end = 100
+    pear = itree.Node('pear', 4, 5, {"x": 4})
     fruit.append(pear)
 
     data = pickle.dumps(fruit)
