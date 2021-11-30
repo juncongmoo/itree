@@ -106,3 +106,8 @@ void remove_zsn(list<shared_ptr<Node>> &nodes) {
     }
   }
 }
+
+shared_ptr<Tree> create_tmp_tree() {
+  auto tree = make_shared<Tree>("",py::dict(),true, 1024,1e-7); 
+  return tree;
+}

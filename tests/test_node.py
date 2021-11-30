@@ -48,6 +48,20 @@ class TestNode(unittest.TestCase):
         
         self.assertNotEqual(id(fruit.nodes[0]), id(apple))
         self.assertEqual(id(fruit.nodes[0].nodes[0]), id(apple.nodes[0]))
+    
+    def test_serialization(self):
+        fruit = itree.Node('fruit')
+        apple = itree.Node('apple',0,1,{"x#":1})
+        fruit.append(apple)
+        fruit.end=100
+        pear = itree.Node('pear',4,5,{"x":4})
+        fruit.add_child(pear)
+        
+        s = itree.serialize_node(fruit)
+        expected="{fruit,0.0,100.0,0$0#{apple,0.0,1.0,0$9#{'x#': 1}}{pear,4.0,5.0,0$8#{'x': 4}}}"
+        self.assertEqual(s, expected)
+        n = itree.deserialize_node(s)
+        self.assertEqual(str(fruit), str(n))
         
 
 if __name__ == '__main__':

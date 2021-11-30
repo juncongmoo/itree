@@ -21,6 +21,8 @@ struct PYBIND11_EXPORT Node {
 
   Node(const string &name_, double start_, double end_, const py::dict &extra_)
       : name(name_), start(start_), end(end_), extra(extra_) {
+    if (name.find(",")!= string::npos)
+      throw std::runtime_error("name cannot contain comma");
     nodes = {};
   }
 

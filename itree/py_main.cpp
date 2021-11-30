@@ -1,8 +1,10 @@
 #include "forest_stats.h"
 #include "nemo.h"
 #include "node.h"
+#include "node_utils.h"
 #include "shared.h"
 #include "tree.h"
+#include "pickle.h"
 #include <iomanip> //put_time
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -10,6 +12,7 @@
 
 namespace py = pybind11;
 using namespace std;
+using namespace pybind11::literals;
 
 string get_time() {
   stringstream ss;
@@ -59,8 +62,19 @@ PYBIND11_MODULE(_itree, m) {
       .def_readwrite("attach_timestamp", &ForestStats::attach_timestamp)
       .def_readwrite("itree_tpl", &ForestStats::itree_tpl)
       .def_readwrite("fast_tail", &ForestStats::fast_tail)
-      .def_readwrite("forest", &ForestStats::forest)
-      .def_readwrite("init_time_us", &ForestStats::init_time_us);
+      //.def_readwrite("forest", &ForestStats::forest)
+      .def_readwrite("init_time_us", &ForestStats::init_time_us)
+      .def(py::pickle(
+          [](const ForestStats &fr) { // __getstate__
+              auto res = serialize_forest_(fr);
+              // py::print("\nr:", res);
+              return res;
+          },
+          [](py::str s) { // __setstate__
+              //py::print("\ns:", s);
+              auto fr = deserialize_forest_(s);
+              return fr;
+          }));
   py::class_<Tree, shared_ptr<Tree>>(m, "Tree", R"--(
     Tree
 
@@ -102,7 +116,17 @@ PYBIND11_MODULE(_itree, m) {
           "depth", &Tree::depth,
           "the max depth of the nary tree, where virtual root has depth 1")
       //.def("deserialize", &Tree::deserialize)
-      ;
+      .def(py::pickle(
+          [](const shared_ptr<Tree> &tr) { // __getstate__
+            auto res = serialize_tree_(tr);
+            //py::print("\nr:", res);
+            return res;
+          },
+          [](py::str s) { // __setstate__
+            //py::print("\ns:", s);
+            auto _t = deserialize_tree_(s);
+            return _t;
+          }));
   py::class_<Node, shared_ptr<Node>>(m, "Node", R"--(
     Node
 
@@ -131,7 +155,22 @@ PYBIND11_MODULE(_itree, m) {
       .def("append", &Node::append,
            "append as current node's children by referencing")
       .def("add_child", &Node::add_child,
-           "add as current node's children by shallow-copying");
+           "add as current node's children by shallow-copying")
+      .def(py::pickle(
+          [](const shared_ptr<Node> &n) { // __getstate__
+            /* Return a tuple that fully encodes the state of the object */
+            //py::print("xxxxxxxxxxxxxxxxxxxx");
+            auto res = serialize_node(n);
+            //py::print(res);
+            return res;
+          },
+          [](py::str s) { // __setstate__
+            //py::print(s);
+            //shared_ptr<Node> r = create_tmp_node();
+            //py::print("yyyyyyyyyyyyyyyyyyyy");
+            auto res = deserialize_node(s);
+            return res;
+          }));
 
   m.def("nemo_transform", &decode);
   m.def("create_virtual_node", &create_virtual_node);

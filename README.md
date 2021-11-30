@@ -91,6 +91,17 @@ Run the `demo_tree()` function, a tree digraph will be generated:
 
 The green circle node is a virtual node. The yellow record box is the node with max interval.
 
+## Run Tests
+
+```bash
+$python -m unittest discover
+...............
+----------------------------------------------------------------------
+Ran 15 tests in 1.209s
+
+OK
+```
+
 ## License
 
 Tree is licensed under the Apache 2.0 License.

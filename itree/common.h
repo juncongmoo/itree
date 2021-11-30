@@ -33,4 +33,6 @@ py::object mod(const py::str &);
 py::dict _exe(const string &, py::dict &l);
 // py::object load_json();
 string get_uuid();
+
+vector<string> split(string str, string token, int max_ = INT_MAX);
 #endif

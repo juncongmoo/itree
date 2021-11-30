@@ -12,7 +12,7 @@ Format:
 
 struct PYBIND11_EXPORT Tree {
   string tid;
-  string parent_id="";
+  string pid="";
   shared_ptr<Node> root;
   vector<shared_ptr<Node>> stk;
   py::dict extra;
@@ -57,3 +57,5 @@ struct PYBIND11_EXPORT Tree {
   string repr();
   string to_dot_string(const string &);
 };
+
+shared_ptr<Tree> create_tmp_tree();

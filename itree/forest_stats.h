@@ -5,7 +5,7 @@
 using namespace std;
 
 struct PYBIND11_EXPORT ForestStats {
-  long long init_time_us;
+  long long init_time_us = 0;
   // disk I / O
   long long dio_bytes_r = 0;
   long long dio_bytes_w = 0;
@@ -36,7 +36,7 @@ struct PYBIND11_EXPORT ForestStats {
 
   // forest is a dict of: id -> name -> Tree
   // in child class, you can use: self.forest = defaultdict(dict, self.forest)
-  py::dict forest = py::dict();
+  //py::dict forest = py::dict();
 
   // constructor
   ForestStats() : init_time_us(time_us()), overhead_us(0) {}

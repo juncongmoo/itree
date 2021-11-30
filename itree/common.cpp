@@ -127,3 +127,27 @@ py::dict _exe(const string &s, py::dict &l) {
     const static py::list json_list = py::cast(t);
     return mod2(json_list);
 }*/
+
+vector<string> split(string str, string token, int max_) {
+  vector<string> result;
+  int count = 0;
+  while (str.size()) {
+    size_t index = str.find(token);
+    if (index != string::npos) {
+      result.push_back(str.substr(0, index));
+      str = str.substr(index + token.size());
+      if (str.size() == 0)
+        result.push_back(str);
+    } else {
+      result.push_back(str);
+      str = "";
+    }
+    if (++count == max_) {
+      if (!str.empty()) {
+        result.push_back(str);
+      }
+      break;
+    }
+  }
+  return result;
+}
