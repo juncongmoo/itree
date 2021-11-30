@@ -42,16 +42,16 @@ class TestLatency(unittest.TestCase):
         t1 = timer()
         d1 = itree._itree.serialize_node_(tree.root)
         t2 = timer()
-        latency1 = (t2 - t1)*1e6
+        latency1 = (t2 - t1) * 1e6
         print("cpp:", latency1)
-        
+
         tree = demo_tree()
         t1 = timer()
         d2 = itree.serialize_node(tree.root)
         t2 = timer()
-        latency2 = (t2 - t1)*1e6
+        latency2 = (t2 - t1) * 1e6
         print("python:", latency2)
-        
+
         self.assertEqual(d1, d2)
         self.assertTrue(latency1 < latency2)
 

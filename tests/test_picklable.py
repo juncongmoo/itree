@@ -73,6 +73,15 @@ class TestPicklable(unittest.TestCase):
         self.assertEqual(str(t1), str(t2))
         # print(d1, "\n", d2)
 
+    def test_picklable_tree_v2(self):
+        t1 = itree.Tree(tid="", extra={})
+        d1 = pickle.dumps(t1)
+        t2 = pickle.loads(d1)
+        d2 = pickle.dumps(t2)
+        self.assertEqual(d1, d2)
+        self.assertEqual(str(t1), str(t2))
+        # print(d1, "\n", d2)
+
     def test_forest(self):
         f1 = demo_forest()
         d1 = pickle.dumps(f1)
