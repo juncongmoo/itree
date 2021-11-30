@@ -23,8 +23,8 @@ exe = _itree._exe
 time_s = _itree.time_s
 time_ms = _itree.time_ms
 time_us = _itree.time_us
-is_virtual_node = _itree.is_virtual_node
-create_virtual_node = _itree.create_virtual_node
+is_virtual_node = _itree.is_virtual_node_
+create_virtual_node = _itree.create_virtual_node_
 
 
 def is_picklable(o):

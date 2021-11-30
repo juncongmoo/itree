@@ -93,6 +93,12 @@ The green circle node is a virtual node. The yellow record box is the node with 
 
 ## Development
 
+Turn on local build to `ON` in `itree/CMakeLists.txt`:
+
+```
+option(LOCAL_BUILD "build locally" OFF)
+```
+
 - Test
 
 ```bash

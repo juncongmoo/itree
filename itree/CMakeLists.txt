@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(itree)
 
-option(LOCAL_BUILD "build locally" ON)
+option(LOCAL_BUILD "build locally" OFF)
 
 if(LOCAL_BUILD)
     set(CMAKE_BUILD_TYPE Debug)

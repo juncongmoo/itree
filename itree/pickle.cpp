@@ -68,7 +68,7 @@ shared_ptr<Node> deserialize_node_(py::str bs) {
 
 shared_ptr<Node> deserialize_node_impl(const string &d) {
     auto ast = py::module::import("ast");
-    vector<shared_ptr<Node>> stk_ = {create_virtual_node()};
+    vector<shared_ptr<Node>> stk_ = {create_virtual_node_()};
     // auto ss = "{'name': 'World', 'number': 42, 'x': {'name': 'W', 'number': 4}}";
     // py::dict z = ast.attr("literal_eval")(ss);
     // //py::print(z);

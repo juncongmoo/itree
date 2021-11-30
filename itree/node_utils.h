@@ -2,9 +2,9 @@
 #include "node.h"
 #include <memory>
 
-shared_ptr<Node> create_virtual_node();
+shared_ptr<Node> create_virtual_node_();
 shared_ptr<Node> create_tmp_node();
-bool is_virtual_node(const shared_ptr<Node> &n);
+bool is_virtual_node_(const shared_ptr<Node> &n);
 // shared_ptr<Node> deserialize(const string &);
 
 // merge multiple virtual nodes into one

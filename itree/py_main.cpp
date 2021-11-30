@@ -173,9 +173,9 @@ PYBIND11_MODULE(_itree, m) {
             }));
 
     m.def("nemo_transform", &decode);
-    m.def("create_virtual_node", &create_virtual_node);
+    m.def("create_virtual_node_", &create_virtual_node_);
     m.def("create_tmp_node", &create_tmp_node);
-    m.def("is_virtual_node", &is_virtual_node, "check if the node is virtual or not");
+    m.def("is_virtual_node_", &is_virtual_node_, "check if the node is virtual or not");
     m.def("consolidate", &consolidate, R"--(
 merge virtual nodes into one
 )--");

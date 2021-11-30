@@ -40,7 +40,7 @@ struct PYBIND11_EXPORT Tree {
     // https://github.com/pybind/pybind11/issues/957
     Tree(const string &tid_, const py::dict &extra_, bool monotonic_, int capacity, double zin_threshold_)
         : tid(tid_), extra(extra_), monotonic(monotonic_), zin_threshold(zin_threshold_) {
-        root = create_virtual_node();
+        root = create_virtual_node_();
         stk.reserve(capacity);
         stk.push_back(root);
     }
