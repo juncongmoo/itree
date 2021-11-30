@@ -18,7 +18,13 @@ py::str run_length_dict(const py::dict &d) {
 py::dict str_to_dict(const string &dict_str) {
     auto ast = py::module::import("ast");
     auto vs = split(dict_str, "#");
-    return ast.attr("literal_eval")(vs[1]);
+    try{
+        return ast.attr("literal_eval")(vs[1]);
+    }catch(const std::exception &e){
+        cout << "input:" << dict_str << "Error: " << e.what() <<endl;
+        return py::dict();
+    }
+    
 }
 
 py::str serialize_node_(const shared_ptr<Node> &n) {
