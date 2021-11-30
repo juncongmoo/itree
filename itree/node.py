@@ -170,4 +170,3 @@ if __name__ == '__main__':
     print(itree.serialize_node(fruit))
     fruit_v2 = pickle.loads(data)
     print(str(fruit), str(fruit_v2))
-
