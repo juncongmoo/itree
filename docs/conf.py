@@ -38,9 +38,7 @@ import itree
 # -- Project information -----------------------------------------------------
 
 project = "iTree"
-copyright = (
-    f"{datetime.date.today().year}, Juncong Moo, Apache 2.0"  # pylint: disable=redefined-builtin
-)
+copyright = f"{datetime.date.today().year}, Juncong Moo, Apache 2.0"  # pylint: disable=redefined-builtin
 author = "Juncong Moo"
 version = itree.__version__
 release = itree.__version__
@@ -124,6 +122,7 @@ def setup(app):
         True,
     )
     app.add_transform(AutoStructify)
+
 
 source_suffix = [".rst", ".md", ".rmd"]
 # -- Options for doctest -----------------------------------------------------
