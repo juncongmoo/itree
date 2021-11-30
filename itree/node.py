@@ -158,13 +158,7 @@ def deserialize_node(bs: str):
 if __name__ == '__main__':
     import pickle
 
-    """
-    s="{fruit,0.0,100.0,0$0#{apple,0.0,1.0,0$8#{'x': 1}}{pear,4.0,5.0,0$8#{'x': 4}}}"
-    nn = deserialize_node(s)
-    print(nn)"""
-
     fruit = itree.Node('fruit')
-
     apple = itree.Node('apple', 0, 1, {"x": 1})
     fruit.append(apple)
     fruit.end = 100
@@ -173,6 +167,7 @@ if __name__ == '__main__':
 
     data = pickle.dumps(fruit)
     print(data)
+    print(itree.serialize_node(fruit))
     fruit_v2 = pickle.loads(data)
     print(str(fruit), str(fruit_v2))
-    print(1)
+
