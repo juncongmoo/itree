@@ -76,7 +76,7 @@ class Node(_itree.Node):
 
 
 def create_virtual_node() -> Node:
-    return Node(node=_itree.create_virtual_node())
+    return Node(node=_itree.create_virtual_node_())
 
 
 def _consolidate(node: Node):

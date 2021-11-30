@@ -4,6 +4,8 @@ namespace py = pybind11;
 using namespace std;
 using namespace pybind11::literals;
 
+const static auto ast = py::module::import("ast");
+
 py::str run_length_dict(const py::dict &d) {
     if (d.empty())
         return py::str("0#", 2);
@@ -13,7 +15,6 @@ py::str run_length_dict(const py::dict &d) {
 }
 
 py::dict str_to_dict(const string &dict_str) {
-    auto ast = py::module::import("ast");
     auto vs = split(dict_str, "#");
     return ast.attr("literal_eval")(vs[1]);
 }
@@ -67,7 +68,6 @@ shared_ptr<Node> deserialize_node_(py::str bs) {
 }
 
 shared_ptr<Node> deserialize_node_impl(const string &d) {
-    auto ast = py::module::import("ast");
     vector<shared_ptr<Node>> stk_ = {create_virtual_node_()};
     // auto ss = "{'name': 'World', 'number': 42, 'x': {'name': 'W', 'number': 4}}";
     // py::dict z = ast.attr("literal_eval")(ss);
