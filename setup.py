@@ -34,9 +34,9 @@ def _parse_requirements(path):
 class CMakeExtension(setuptools.Extension):
     """An extension with no sources.
 
-  We do not want distutils to handle any of the compilation (instead we rely
-  on CMake), so we always pass an empty list to the constructor.
-  """
+    We do not want distutils to handle any of the compilation (instead we rely
+    on CMake), so we always pass an empty list to the constructor.
+    """
 
     def __init__(self, name, source_dir=""):
         super().__init__(name, sources=[])
@@ -46,8 +46,8 @@ class CMakeExtension(setuptools.Extension):
 class BuildCMakeExtension(build_ext.build_ext):
     """Our custom build_ext command.
 
-  Uses CMake to build extensions instead of a bare compiler (e.g. gcc, clang).
-  """
+    Uses CMake to build extensions instead of a bare compiler (e.g. gcc, clang).
+    """
 
     def run(self):
         self._check_build_environment()
@@ -131,4 +131,3 @@ setuptools.setup(
     ],
     license="Apache 2.0",
 )
-

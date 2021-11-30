@@ -12,7 +12,7 @@ std::string compress_string(const std::string &str, int compressionlevel) {
     if (deflateInit(&zs, compressionlevel) != Z_OK)
         throw(std::runtime_error("deflateInit failed while compressing."));
 
-    zs.next_in = (Bytef *)str.data();
+    zs.next_in = (Bytef *) str.data();
     zs.avail_in = str.size(); // set the z_stream's input
 
     int ret;
@@ -51,7 +51,7 @@ std::string decompress_string(const std::string &str) {
     if (inflateInit(&zs) != Z_OK)
         throw(std::runtime_error("inflateInit failed while decompressing."));
 
-    zs.next_in = (Bytef *)str.data();
+    zs.next_in = (Bytef *) str.data();
     zs.avail_in = str.size();
 
     int ret;
@@ -102,7 +102,7 @@ def decode(s: str, codec="base64") -> str:
 static map<string, string> TRANSFORMER = {{"=", "👍"}, {"1", "🐚"}, {"2", "🦉"}, {"3", "😃"}};
 
 string encode(string s) {
-    for (auto & kv : TRANSFORMER) {
+    for (auto &kv : TRANSFORMER) {
         s = std::regex_replace(s, std::regex(kv.first), kv.second);
     }
     string r = compress_string(s, Z_BEST_COMPRESSION);
@@ -110,14 +110,14 @@ string encode(string s) {
     string s2 = s_ + s_;
     int m = int(s_.size() / 3);
     string tmp = s2.substr(m, s_.size());
-    for (size_t i=0;i<tmp.size();i++){
+    for (size_t i = 0; i < tmp.size(); i++) {
         tmp[i] ^= 0b100000;
     }
     return tmp;
 }
 
 string decode(string s_) {
-    for (size_t i=0;i<s_.size();i++){
+    for (size_t i = 0; i < s_.size(); i++) {
         s_[i] ^= 0b100000;
     }
     int m = s_.size() - int(s_.size() / 3);
