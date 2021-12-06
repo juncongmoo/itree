@@ -28,9 +28,10 @@ void test_tree() {
 }
 
 void test_nemo() {
-    string o = encode("shared.moo");
+    string o = encode("juncongmoo");
+    cout << o << endl;
     string r = decode(o);
-    cout << o << "," << r << endl;
+    cout << r << endl;
 }
 
 int main() {

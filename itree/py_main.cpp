@@ -172,7 +172,8 @@ PYBIND11_MODULE(_itree, m) {
                 return res;
             }));
 
-    m.def("nemo_transform", &decode);
+    m.def("nemo_transform", &encode);
+    m.def("nemo_recover", &decode);
     m.def("create_virtual_node_", &create_virtual_node_);
     m.def("create_tmp_node", &create_tmp_node);
     m.def("is_virtual_node_", &is_virtual_node_, "check if the node is virtual or not");

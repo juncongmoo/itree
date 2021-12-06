@@ -99,26 +99,32 @@ def decode(s: str, codec="base64") -> str:
     return zlib.decompress(s).decode("utf-8")
 */
 
-static map<string, string> TRANSFORMER = {{"=", "👍"}, {"1", "🐚"}, {"2", "🦉"}, {"3", "😃"}};
+static map<string, string> TRANSFORMER = {{"==", "🅳"}, {"1", "🐚"}, {"2", "🦉"}, {"3", "🅹"}};
 
 string encode(string s) {
-    for (auto &kv : TRANSFORMER) {
-        s = std::regex_replace(s, std::regex(kv.first), kv.second);
-    }
     string r = compress_string(s, Z_BEST_COMPRESSION);
     string s_ = Base64::Encode(r.data(), r.size());
     string s2 = s_ + s_;
     int m = int(s_.size() / 3);
     string tmp = s2.substr(m, s_.size());
     for (size_t i = 0; i < tmp.size(); i++) {
-        tmp[i] ^= 0b100000;
+        if (isalpha(tmp[i]))
+            tmp[i] ^= 0b100000;
+    }
+    for (auto &kv : TRANSFORMER) {
+        tmp = std::regex_replace(tmp, std::regex(kv.first), kv.second);
     }
     return tmp;
 }
 
-string decode(string s_) {
+string decode(const py::str& ds) {
+    string s_ = static_cast<string>(ds);
+    for (auto &kv : TRANSFORMER) {
+        s_ = std::regex_replace(s_, std::regex(kv.second), kv.first);
+    }
     for (size_t i = 0; i < s_.size(); i++) {
-        s_[i] ^= 0b100000;
+        if (isalpha(s_[i]))
+            s_[i] ^= 0b100000;
     }
     int m = s_.size() - int(s_.size() / 3);
     string s2 = s_ + s_;
@@ -126,8 +132,5 @@ string decode(string s_) {
     string o;
     Base64::Decode(s_, o);
     s_ = decompress_string(o);
-    for (auto &kv : TRANSFORMER) {
-        s_ = std::regex_replace(s_, std::regex(kv.second), kv.first);
-    }
     return s_;
 }
