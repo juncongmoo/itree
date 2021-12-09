@@ -98,8 +98,10 @@ PYBIND11_MODULE(_itree, m) {
         .def("finish", &Tree::finish)
         .def("__repr__", &Tree::repr)
         .def("__str__", &Tree::repr)
+        .def("__eq__", &Tree::__eq__)
         .def("to_dot_string", &Tree::to_dot_string, py::arg("node_shape") = py::str("circle"))
-        .def("set_as_non_monotonic", &Tree::set_as_non_monotonic, "mark it as non-monotonic")
+        .def("non_mono", &Tree::non_mono, "mark tree as non-monotonic")
+        .def("deserialize", &Tree::deserialize, "deserialize string to a Tree object itself")
         .def_readwrite("extra", &Tree::extra)
         .def_readwrite("tid", &Tree::tid)
         .def_readwrite("root", &Tree::root)
@@ -176,6 +178,7 @@ PYBIND11_MODULE(_itree, m) {
     m.def("nemo_recover", &decode);
     m.def("create_virtual_node_", &create_virtual_node_);
     m.def("create_tmp_node", &create_tmp_node);
+    m.def("create_tmp_tree", &create_tmp_tree);
     m.def("is_virtual_node_", &is_virtual_node_, "check if the node is virtual or not");
     m.def("consolidate", &consolidate, R"--(
 merge virtual nodes into one
