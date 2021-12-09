@@ -51,9 +51,11 @@ struct PYBIND11_EXPORT Tree {
     void discover(const string &name, double start_, const py::dict &extra);
     void finish(const string &name, double end_, const py::dict &extra);
     // don't want to put in the constructor to make it more complex
-    inline void set_as_non_monotonic() { monotonic = false; }
+    inline void non_mono() { monotonic = false; }
     string repr();
     string to_dot_string(const string &);
+    void deserialize(const py::str &);
+    bool __eq__(const shared_ptr<Tree>& other);
 };
 
 shared_ptr<Tree> create_tmp_tree();

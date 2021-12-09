@@ -1,6 +1,7 @@
 #include "tree.h"
 #include "fmt.h"
 #include "node_utils.h"
+#include "pickle.h"
 #include <assert.h>
 
 bool Tree::is_valid() { return root != nullptr and !stk.empty(); }
@@ -32,7 +33,7 @@ void remove_zin(list<shared_ptr<Node>> &nodes);
 void Tree::finish(const string &name, double end, const py::dict &extra) {
     if (stk.empty() or (stk.back()->name != name)) {
         printf("💀 debug info: %zu, %s, %s\n", stk.size(), stk.back()->name.c_str(), name.c_str());
-        throw std::runtime_error("stk should be non-empty and name should match!");
+        throw runtime_error("stk should be non-empty and name should match!");
     }
 
 #if 1
@@ -90,6 +91,27 @@ string Tree::repr() {
 }
 
 string Tree::to_dot_string(const string &node_shape) { return ::to_dot_string(root, node_shape); }
+
+void Tree::deserialize(const py::str &s) { _deserialize_tree(this, s); }
+
+bool Tree::__eq__(const shared_ptr<Tree> &other) {
+    bool b = (tid == other->tid && pid == other->pid && mode == other->mode && count == other->count
+              && depth == other->depth && monotonic == other->monotonic && zin_threshold == other->zin_threshold);
+    if (!b) {
+        return false;
+    }
+    auto x1 = py::cast<py::str>(extra);
+    auto x2 = py::cast<py::str>(other->extra);
+
+    b = static_cast<string>(x1) == static_cast<string>(x2);
+    if (!b) {
+        return false;
+    }
+
+    auto s1 = serialize_node_(this->root);
+    auto s2 = serialize_node_(other->root);
+    return static_cast<string>(s1) == static_cast<string>(s2);
+}
 
 void remove_zin(list<shared_ptr<Node>> &nodes) {
     auto itr = nodes.cbegin();

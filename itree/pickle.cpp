@@ -172,6 +172,38 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     return tree;
 }
 
+void _deserialize_tree(Tree* tree, py::str bs) {
+    // //py::print(bs);
+    string d = static_cast<std::string>(bs);
+    if (d.empty())
+        return;
+    if (d[0] != 't') {
+        throw invalid_argument(d);
+    }
+    auto v1 = split(d, "%", 1);
+    auto v2 = split(v1[0], "^", 1);
+    int version = stoi(v2[0].substr(1));
+    assert(version == 1);
+    // //py::print(version);
+    auto v3 = split(v2[1], ",", 7);
+    // {tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}
+    // //py::print("gg:", v3[0], v3[1], v3[2], v3[3], v3[4], v3[5], v3[6], v3[7]);
+    tree->tid = v3[0];
+    tree->pid = v3[1];
+    tree->mode = stoi(v3[2]);
+    tree->count = stoi(v3[3]);
+    tree->depth = stoi(v3[4]);
+    tree->monotonic = stoi(v3[5]);
+    tree->zin_threshold = stod(v3[6]);
+    // //py::print("tree->zin_threshold:", tree->zin_threshold);
+    // //py::print("v3[7]:", v3[7]);
+    tree->extra = str_to_dict(v3[7]);
+
+    // py::print("v1[1]:", v1[1]);
+    shared_ptr<Node> root = deserialize_node_(v1[1]);
+    tree->root = root;
+}
+
 py::str serialize_forest_(const ForestStats &fr) {
     py::str s = "f1^{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}"_s.format(fr.init_time_us,
                                                                   fr.dio_bytes_r,

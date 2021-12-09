@@ -25,6 +25,8 @@ time_ms = _itree.time_ms
 time_us = _itree.time_us
 is_virtual_node = _itree.is_virtual_node_
 create_virtual_node = _itree.create_virtual_node_
+create_tmp_tree = _itree.create_tmp_tree
+create_tmp_node = _itree.create_tmp_node
 
 
 def is_picklable(o):
