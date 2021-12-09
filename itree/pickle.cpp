@@ -204,7 +204,7 @@ void _deserialize_tree(Tree* tree, py::str bs) {
     tree->root = root;
 }
 
-    py::str serialize_forest_(const ForestStats &fr) {
+py::str serialize_forest_(const ForestStats &fr) {
     py::str s = "f1^{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}"_s.format(fr.init_time_us,
                                                                   fr.dio_bytes_r,
                                                                   fr.dio_bytes_w,
