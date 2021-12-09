@@ -16,7 +16,7 @@ class Tree(_itree.Tree):
     """An interval tree"""
 
     def __init__(
-        self, tid=None, extra={}, monotonic=True, capacity=1024, zin_threshold=1e-7
+        self, tid=None, extra=None, monotonic=True, capacity=1024, zin_threshold=1e-7
     ):
         """Constructor of Tree
 
@@ -29,19 +29,19 @@ class Tree(_itree.Tree):
 
         super().__init__(
             tid=tid,
-            extra=extra,
+            extra=extra if extra is not None else {},
             monotonic=monotonic,
             capacity=capacity,
             zin_threshold=zin_threshold,
         )
 
-    def start(self, a, b, extra={}):
+    def start(self, a, b, extra=None):
         """discover a node with name `a` and value `b`, and extra"""
-        self.discover(a, b, extra)
+        self.discover(a, b, extra if extra is not None else {})
 
-    def end(self, a, b, extra={}):
+    def end(self, a, b, extra=None):
         """finish a node with name `a` and value `b`, and extra"""
-        self.finish(a, b, extra)
+        self.finish(a, b, extra if extra is not None else {})
 
     def consolidate(self):
         """consolidate virtual nodes if any"""
