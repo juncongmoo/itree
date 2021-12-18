@@ -139,7 +139,6 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
 }
 
 shared_ptr<Tree> deserialize_tree_(py::str bs) {
-    // py::print(bs);
     string d = static_cast<std::string>(bs);
     auto tree = create_tmp_tree();
     if (d.empty())
@@ -147,33 +146,33 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     if (d[0] != 't') {
         throw invalid_argument(d);
     }
-    auto v1 = split(d, "%", 1);
-    auto v2 = split(v1[0], "^", 1);
-    int version = stoi(v2[0].substr(1));
+    auto v = split(d, ",", 7);
+    auto v1 = split(v[0], "^");
+    int version = stoi(v1[0].substr(1));
     assert(version == 1);
-    // py::print(version);
-    auto v3 = split(v2[1], ",", 7);
-    // {tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}
-    // py::print("gg:", v3[0], v3[1], v3[2], v3[3], v3[4], v3[5], v3[6], v3[7]);
-    tree->tid = v3[0];
-    tree->pid = v3[1];
-    tree->mode = stoi(v3[2]);
-    tree->count = stoi(v3[3]);
-    tree->depth = stoi(v3[4]);
-    tree->monotonic = stoi(v3[5]);
-    tree->zin_threshold = stod(v3[6]);
-    // py::print("tree->zin_threshold:", tree->zin_threshold);
-    // py::print("v3[7]:", v3[7]);
-    tree->extra = str_to_dict(v3[7]);
 
-    // py::print("v1[1]:", v1[1]);
-    shared_ptr<Node> root = deserialize_node_(v1[1]);
+    tree->tid = v1[1];
+    tree->pid = v[1];
+    tree->mode = stoi(v[2]);
+    tree->count = stoi(v[3]);
+    tree->depth = stoi(v[4]);
+    tree->monotonic = stoi(v[5]);
+    tree->zin_threshold = stod(v[6]);
+    string &t = v[7];
+    auto v2 = split(t, "#", 1);
+    int run_len = stoi(v2[0]);
+    auto dict_ = v2[1].substr(0, run_len);
+    auto ast = py::module::import("ast");
+    tree->extra = ast.attr("literal_eval")(dict_);
+    auto rest = v2[1].substr(run_len + 1);
+    assert(v2[1][run_len] == '%');
+
+    shared_ptr<Node> root = deserialize_node_(rest);
     tree->root = root;
     return tree;
 }
 
 void _deserialize_tree(Tree* tree, py::str bs) {
-    // py::print(bs);
     string d = static_cast<std::string>(bs);
     if (d.empty())
         return;
@@ -195,15 +194,12 @@ void _deserialize_tree(Tree* tree, py::str bs) {
     string& t = v[7];
     auto v2 = split(t, "#", 1);
     int run_len = stoi(v2[0]);
-    // py::print("run_len", run_len);
     auto dict_ = v2[1].substr(0, run_len);
-    // py::print("dict_", dict_);
     auto ast = py::module::import("ast");
     tree->extra = ast.attr("literal_eval")(dict_);
     auto rest = v2[1].substr(run_len+1);
     assert(v2[1][run_len] == '%');
 
-    // py::print("v1[1]:", v1[1]);
     shared_ptr<Node> root = deserialize_node_(rest);
     tree->root = root;
 }
