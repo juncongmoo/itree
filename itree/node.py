@@ -11,11 +11,11 @@ def serialize_node(n):
     def __f(n, s: str = ""):
         """serialize_node a Node to string"""
         if n:
-            extra_ = "0#"
+            extra_ = "0\x07"
             if n.extra:
                 extra_ = str(n.extra)
-                extra_ = f"{len(extra_)}#{extra_}"
-            s += "[" + f"{n.name},{n.start},{n.end},{n.nid}${extra_}"
+                extra_ = f"{len(extra_)}\x07{extra_}"
+            s += "[" + f"{n.name},{n.start},{n.end},{n.nid}\x08{extra_}"
             for i in n.nodes:
                 s = __f(i, s)
             s += "]"
@@ -123,7 +123,7 @@ def deserialize_node(bs: str):
                 t = __create_tmp_node()
                 stk_[-1].append(t)
                 stk_.append(t)
-        elif ch == "$":
+        elif ch == "\x08":
             if s:
                 kv = s.split(",")
                 stk_[-1].name = kv[0]
@@ -131,7 +131,7 @@ def deserialize_node(bs: str):
                 stk_[-1].end = str_to_number(kv[2])
                 stk_[-1].nid = int(kv[3])
                 s = ""
-                extra_len_str, remaining = bs[i + 1 :].split("#", 1)
+                extra_len_str, remaining = bs[i + 1 :].split("\x07", 1)
                 extra_len = int(extra_len_str)
                 if extra_len == 0:
                     stk_[-1].extra = {}
