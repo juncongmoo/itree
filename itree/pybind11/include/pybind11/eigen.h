@@ -23,120 +23,136 @@
 // 2. we definitely want to ignore any MSVC warnings originating from Eigen code,
 // it is probably best to keep this around indefinitely.
 #if defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable: 4127) // C4127: conditional expression is constant
+#    pragma warning(push)
+#    pragma warning(disable : 4127) // C4127: conditional expression is constant
 #endif
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
 #if defined(_MSC_VER)
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 // Eigen prior to 3.2.7 doesn't have proper move constructors--but worse, some classes get implicit
 // move constructors that break things.  We could detect this an explicitly copy, but an extra copy
 // of matrices seems highly undesirable.
-static_assert(EIGEN_VERSION_AT_LEAST(3,2,7), "Eigen support in pybind11 requires Eigen >= 3.2.7");
+static_assert(EIGEN_VERSION_AT_LEAST(3, 2, 7), "Eigen support in pybind11 requires Eigen >= 3.2.7");
 
 PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 
 // Provide a convenience alias for easier pass-by-ref usage with fully dynamic strides:
 using EigenDStride = Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>;
-template <typename MatrixType> using EigenDRef = Eigen::Ref<MatrixType, 0, EigenDStride>;
-template <typename MatrixType> using EigenDMap = Eigen::Map<MatrixType, 0, EigenDStride>;
+template <typename MatrixType>
+using EigenDRef = Eigen::Ref<MatrixType, 0, EigenDStride>;
+template <typename MatrixType>
+using EigenDMap = Eigen::Map<MatrixType, 0, EigenDStride>;
 
 PYBIND11_NAMESPACE_BEGIN(detail)
 
-#if EIGEN_VERSION_AT_LEAST(3,3,0)
+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)
 using EigenIndex = Eigen::Index;
 #else
 using EigenIndex = EIGEN_DEFAULT_DENSE_INDEX_TYPE;
 #endif
 
 // Matches Eigen::Map, Eigen::Ref, blocks, etc:
-template <typename T> using is_eigen_dense_map = all_of<is_template_base_of<Eigen::DenseBase, T>, std::is_base_of<Eigen::MapBase<T, Eigen::ReadOnlyAccessors>, T>>;
-template <typename T> using is_eigen_mutable_map = std::is_base_of<Eigen::MapBase<T, Eigen::WriteAccessors>, T>;
-template <typename T> using is_eigen_dense_plain = all_of<negation<is_eigen_dense_map<T>>, is_template_base_of<Eigen::PlainObjectBase, T>>;
-template <typename T> using is_eigen_sparse = is_template_base_of<Eigen::SparseMatrixBase, T>;
+template <typename T>
+using is_eigen_dense_map
+    = all_of<is_template_base_of<Eigen::DenseBase, T>, std::is_base_of<Eigen::MapBase<T, Eigen::ReadOnlyAccessors>, T>>;
+template <typename T>
+using is_eigen_mutable_map = std::is_base_of<Eigen::MapBase<T, Eigen::WriteAccessors>, T>;
+template <typename T>
+using is_eigen_dense_plain = all_of<negation<is_eigen_dense_map<T>>, is_template_base_of<Eigen::PlainObjectBase, T>>;
+template <typename T>
+using is_eigen_sparse = is_template_base_of<Eigen::SparseMatrixBase, T>;
 // Test for objects inheriting from EigenBase<Derived> that aren't captured by the above.  This
 // basically covers anything that can be assigned to a dense matrix but that don't have a typical
 // matrix data layout that can be copied from their .data().  For example, DiagonalMatrix and
 // SelfAdjointView fall into this category.
-template <typename T> using is_eigen_other = all_of<
-    is_template_base_of<Eigen::EigenBase, T>,
-    negation<any_of<is_eigen_dense_map<T>, is_eigen_dense_plain<T>, is_eigen_sparse<T>>>
->;
+template <typename T>
+using is_eigen_other = all_of<is_template_base_of<Eigen::EigenBase, T>,
+                              negation<any_of<is_eigen_dense_map<T>, is_eigen_dense_plain<T>, is_eigen_sparse<T>>>>;
 
 // Captures numpy/eigen conformability status (returned by EigenProps::conformable()):
-template <bool EigenRowMajor> struct EigenConformable {
+template <bool EigenRowMajor>
+struct EigenConformable {
     bool conformable = false;
     EigenIndex rows = 0, cols = 0;
-    EigenDStride stride{0, 0};      // Only valid if negativestrides is false!
-    bool negativestrides = false;   // If true, do not use stride!
+    EigenDStride stride{0, 0};    // Only valid if negativestrides is false!
+    bool negativestrides = false; // If true, do not use stride!
 
     // NOLINTNEXTLINE(google-explicit-constructor)
     EigenConformable(bool fits = false) : conformable{fits} {}
     // Matrix type:
-    EigenConformable(EigenIndex r, EigenIndex c,
-            EigenIndex rstride, EigenIndex cstride) :
-        conformable{true}, rows{r}, cols{c} {
-        // TODO: when Eigen bug #747 is fixed, remove the tests for non-negativity. http://eigen.tuxfamily.org/bz/show_bug.cgi?id=747
+    EigenConformable(EigenIndex r, EigenIndex c, EigenIndex rstride, EigenIndex cstride)
+        : conformable{true}, rows{r}, cols{c} {
+        // TODO: when Eigen bug #747 is fixed, remove the tests for non-negativity.
+        // http://eigen.tuxfamily.org/bz/show_bug.cgi?id=747
         if (rstride < 0 || cstride < 0) {
             negativestrides = true;
         } else {
             stride = {EigenRowMajor ? rstride : cstride /* outer stride */,
-                      EigenRowMajor ? cstride : rstride /* inner stride */ };
+                      EigenRowMajor ? cstride : rstride /* inner stride */};
         }
     }
     // Vector type:
     EigenConformable(EigenIndex r, EigenIndex c, EigenIndex stride)
-        : EigenConformable(r, c, r == 1 ? c*stride : stride, c == 1 ? r : r*stride) {}
+        : EigenConformable(r, c, r == 1 ? c * stride : stride, c == 1 ? r : r * stride) {}
 
-    template <typename props> bool stride_compatible() const {
+    template <typename props>
+    bool stride_compatible() const {
         // To have compatible strides, we need (on both dimensions) one of fully dynamic strides,
         // matching strides, or a dimension size of 1 (in which case the stride value is irrelevant)
-        return
-            !negativestrides &&
-            (props::inner_stride == Eigen::Dynamic || props::inner_stride == stride.inner() ||
-                (EigenRowMajor ? cols : rows) == 1) &&
-            (props::outer_stride == Eigen::Dynamic || props::outer_stride == stride.outer() ||
-                (EigenRowMajor ? rows : cols) == 1);
+        return !negativestrides
+               && (props::inner_stride == Eigen::Dynamic || props::inner_stride == stride.inner()
+                   || (EigenRowMajor ? cols : rows) == 1)
+               && (props::outer_stride == Eigen::Dynamic || props::outer_stride == stride.outer()
+                   || (EigenRowMajor ? rows : cols) == 1);
     }
     // NOLINTNEXTLINE(google-explicit-constructor)
     operator bool() const { return conformable; }
 };
 
-template <typename Type> struct eigen_extract_stride { using type = Type; };
+template <typename Type>
+struct eigen_extract_stride {
+    using type = Type;
+};
 template <typename PlainObjectType, int MapOptions, typename StrideType>
-struct eigen_extract_stride<Eigen::Map<PlainObjectType, MapOptions, StrideType>> { using type = StrideType; };
+struct eigen_extract_stride<Eigen::Map<PlainObjectType, MapOptions, StrideType>> {
+    using type = StrideType;
+};
 template <typename PlainObjectType, int Options, typename StrideType>
-struct eigen_extract_stride<Eigen::Ref<PlainObjectType, Options, StrideType>> { using type = StrideType; };
+struct eigen_extract_stride<Eigen::Ref<PlainObjectType, Options, StrideType>> {
+    using type = StrideType;
+};
 
 // Helper struct for extracting information from an Eigen type
-template <typename Type_> struct EigenProps {
+template <typename Type_>
+struct EigenProps {
     using Type = Type_;
     using Scalar = typename Type::Scalar;
     using StrideType = typename eigen_extract_stride<Type>::type;
-    static constexpr EigenIndex
-        rows = Type::RowsAtCompileTime,
-        cols = Type::ColsAtCompileTime,
-        size = Type::SizeAtCompileTime;
-    static constexpr bool
-        row_major = Type::IsRowMajor,
-        vector = Type::IsVectorAtCompileTime, // At least one dimension has fixed size 1
-        fixed_rows = rows != Eigen::Dynamic,
-        fixed_cols = cols != Eigen::Dynamic,
-        fixed = size != Eigen::Dynamic, // Fully-fixed size
-        dynamic = !fixed_rows && !fixed_cols; // Fully-dynamic size
+    static constexpr EigenIndex rows = Type::RowsAtCompileTime, cols = Type::ColsAtCompileTime,
+                                size = Type::SizeAtCompileTime;
+    static constexpr bool row_major = Type::IsRowMajor,
+                          vector = Type::IsVectorAtCompileTime, // At least one dimension has fixed size 1
+        fixed_rows = rows != Eigen::Dynamic, fixed_cols = cols != Eigen::Dynamic,
+                          fixed = size != Eigen::Dynamic, // Fully-fixed size
+        dynamic = !fixed_rows && !fixed_cols;             // Fully-dynamic size
 
-    template <EigenIndex i, EigenIndex ifzero> using if_zero = std::integral_constant<EigenIndex, i == 0 ? ifzero : i>;
+    template <EigenIndex i, EigenIndex ifzero>
+    using if_zero = std::integral_constant<EigenIndex, i == 0 ? ifzero : i>;
     static constexpr EigenIndex inner_stride = if_zero<StrideType::InnerStrideAtCompileTime, 1>::value,
-                                outer_stride = if_zero<StrideType::OuterStrideAtCompileTime,
-                                                       vector ? size : row_major ? cols : rows>::value;
+                                outer_stride = if_zero < StrideType::OuterStrideAtCompileTime,
+                                vector      ? size
+                                : row_major ? cols
+                                            : rows > ::value;
     static constexpr bool dynamic_stride = inner_stride == Eigen::Dynamic && outer_stride == Eigen::Dynamic;
-    static constexpr bool requires_row_major = !dynamic_stride && !vector && (row_major ? inner_stride : outer_stride) == 1;
-    static constexpr bool requires_col_major = !dynamic_stride && !vector && (row_major ? outer_stride : inner_stride) == 1;
+    static constexpr bool requires_row_major
+        = !dynamic_stride && !vector && (row_major ? inner_stride : outer_stride) == 1;
+    static constexpr bool requires_col_major
+        = !dynamic_stride && !vector && (row_major ? outer_stride : inner_stride) == 1;
 
     // Takes an input array and determines whether we can make it fit into the Eigen type.  If
     // the array is a vector, we attempt to fit it into either an Eigen 1xN or Nx1 vector
@@ -148,13 +164,11 @@ template <typename Type_> struct EigenProps {
 
         if (dims == 2) { // Matrix type: require exact match (or dynamic)
 
-            EigenIndex
-                np_rows = a.shape(0),
-                np_cols = a.shape(1),
-                np_rstride = a.strides(0) / static_cast<ssize_t>(sizeof(Scalar)),
-                np_cstride = a.strides(1) / static_cast<ssize_t>(sizeof(Scalar));
-            if ((PYBIND11_SILENCE_MSVC_C4127(fixed_rows) && np_rows != rows) ||
-                (PYBIND11_SILENCE_MSVC_C4127(fixed_cols) && np_cols != cols))
+            EigenIndex np_rows = a.shape(0), np_cols = a.shape(1),
+                       np_rstride = a.strides(0) / static_cast<ssize_t>(sizeof(Scalar)),
+                       np_cstride = a.strides(1) / static_cast<ssize_t>(sizeof(Scalar));
+            if ((PYBIND11_SILENCE_MSVC_C4127(fixed_rows) && np_rows != rows)
+                || (PYBIND11_SILENCE_MSVC_C4127(fixed_cols) && np_cols != cols))
                 return false;
 
             return {np_rows, np_cols, np_rstride, np_cstride};
@@ -162,8 +176,7 @@ template <typename Type_> struct EigenProps {
 
         // Otherwise we're storing an n-vector.  Only one of the strides will be used, but whichever
         // is used, we want the (single) numpy stride value.
-        const EigenIndex n = a.shape(0),
-              stride = a.strides(0) / static_cast<ssize_t>(sizeof(Scalar));
+        const EigenIndex n = a.shape(0), stride = a.strides(0) / static_cast<ssize_t>(sizeof(Scalar));
 
         if (vector) { // Eigen type is a compile-time vector
             if (PYBIND11_SILENCE_MSVC_C4127(fixed) && size != n)
@@ -177,11 +190,13 @@ template <typename Type_> struct EigenProps {
         if (fixed_cols) {
             // Since this isn't a vector, cols must be != 1.  We allow this only if it exactly
             // equals the number of elements (rows is Dynamic, and so 1 row is allowed).
-            if (cols != n) return false;
+            if (cols != n)
+                return false;
             return {1, n, stride};
         } // Otherwise it's either fully dynamic, or column dynamic; both become a column vector
-            if (PYBIND11_SILENCE_MSVC_C4127(fixed_rows) && rows != n) return false;
-            return {n, 1, stride};
+        if (PYBIND11_SILENCE_MSVC_C4127(fixed_rows) && rows != n)
+            return false;
+        return {n, 1, stride};
     }
 
     static constexpr bool show_writeable = is_eigen_dense_map<Type>::value && is_eigen_mutable_map<Type>::value;
@@ -189,33 +204,30 @@ template <typename Type_> struct EigenProps {
     static constexpr bool show_c_contiguous = show_order && requires_row_major;
     static constexpr bool show_f_contiguous = !show_c_contiguous && show_order && requires_col_major;
 
-    static constexpr auto descriptor =
-        _("numpy.ndarray[") + npy_format_descriptor<Scalar>::name +
-        _("[")  + _<fixed_rows>(_<(size_t) rows>(), _("m")) +
-        _(", ") + _<fixed_cols>(_<(size_t) cols>(), _("n")) +
-        _("]") +
-        // For a reference type (e.g. Ref<MatrixXd>) we have other constraints that might need to be
-        // satisfied: writeable=True (for a mutable reference), and, depending on the map's stride
-        // options, possibly f_contiguous or c_contiguous.  We include them in the descriptor output
-        // to provide some hint as to why a TypeError is occurring (otherwise it can be confusing to
-        // see that a function accepts a 'numpy.ndarray[float64[3,2]]' and an error message that you
-        // *gave* a numpy.ndarray of the right type and dimensions.
-        _<show_writeable>(", flags.writeable", "") +
-        _<show_c_contiguous>(", flags.c_contiguous", "") +
-        _<show_f_contiguous>(", flags.f_contiguous", "") +
-        _("]");
+    static constexpr auto descriptor
+        = _("numpy.ndarray[") + npy_format_descriptor<Scalar>::name + _("[") + _<fixed_rows>(_<(size_t) rows>(), _("m"))
+          + _(", ") + _<fixed_cols>(_<(size_t) cols>(), _("n")) + _("]") +
+          // For a reference type (e.g. Ref<MatrixXd>) we have other constraints that might need to be
+          // satisfied: writeable=True (for a mutable reference), and, depending on the map's stride
+          // options, possibly f_contiguous or c_contiguous.  We include them in the descriptor output
+          // to provide some hint as to why a TypeError is occurring (otherwise it can be confusing to
+          // see that a function accepts a 'numpy.ndarray[float64[3,2]]' and an error message that you
+          // *gave* a numpy.ndarray of the right type and dimensions.
+          _<show_writeable>(", flags.writeable", "") + _<show_c_contiguous>(", flags.c_contiguous", "")
+          + _<show_f_contiguous>(", flags.f_contiguous", "") + _("]");
 };
 
 // Casts an Eigen type to numpy array.  If given a base, the numpy array references the src data,
 // otherwise it'll make a copy.  writeable lets you turn off the writeable flag for the array.
-template <typename props> handle eigen_array_cast(typename props::Type const &src, handle base = handle(), bool writeable = true) {
+template <typename props>
+handle eigen_array_cast(typename props::Type const &src, handle base = handle(), bool writeable = true) {
     constexpr ssize_t elem_size = sizeof(typename props::Scalar);
     array a;
     if (props::vector)
-        a = array({ src.size() }, { elem_size * src.innerStride() }, src.data(), base);
+        a = array({src.size()}, {elem_size * src.innerStride()}, src.data(), base);
     else
-        a = array({ src.rows(), src.cols() }, { elem_size * src.rowStride(), elem_size * src.colStride() },
-                  src.data(), base);
+        a = array(
+            {src.rows(), src.cols()}, {elem_size * src.rowStride(), elem_size * src.colStride()}, src.data(), base);
 
     if (!writeable)
         array_proxy(a.ptr())->flags &= ~detail::npy_api::NPY_ARRAY_WRITEABLE_;
@@ -246,7 +258,7 @@ handle eigen_encapsulate(Type *src) {
 
 // Type caster for regular, dense matrix types (e.g. MatrixXd), but not maps/refs/etc. of dense
 // types.
-template<typename Type>
+template <typename Type>
 struct type_caster<Type, enable_if_t<is_eigen_dense_plain<Type>::value>> {
     using Scalar = typename Type::Scalar;
     using props = EigenProps<Type>;
@@ -273,8 +285,10 @@ struct type_caster<Type, enable_if_t<is_eigen_dense_plain<Type>::value>> {
         // Allocate the new type, then build a numpy reference into it
         value = Type(fits.rows, fits.cols);
         auto ref = reinterpret_steal<array>(eigen_ref_array<props>(value));
-        if (dims == 1) ref = ref.squeeze();
-        else if (ref.ndim() == 1) buf = buf.squeeze();
+        if (dims == 1)
+            ref = ref.squeeze();
+        else if (ref.ndim() == 1)
+            buf = buf.squeeze();
 
         int result = detail::npy_api::get().PyArray_CopyInto_(ref.ptr(), buf.ptr());
 
@@ -287,7 +301,6 @@ struct type_caster<Type, enable_if_t<is_eigen_dense_plain<Type>::value>> {
     }
 
 private:
-
     // Cast implementation
     template <typename CType>
     static handle cast_impl(CType *src, return_value_policy policy, handle parent) {
@@ -310,7 +323,6 @@ private:
     }
 
 public:
-
     // Normal returned non-reference, non-const value:
     static handle cast(Type &&src, return_value_policy /* policy */, handle parent) {
         return cast_impl(&src, return_value_policy::move, parent);
@@ -332,9 +344,7 @@ public:
         return cast(&src, policy, parent);
     }
     // non-const pointer return
-    static handle cast(Type *src, return_value_policy policy, handle parent) {
-        return cast_impl(src, policy, parent);
-    }
+    static handle cast(Type *src, return_value_policy policy, handle parent) { return cast_impl(src, policy, parent); }
     // const pointer return
     static handle cast(const Type *src, return_value_policy policy, handle parent) {
         return cast_impl(src, policy, parent);
@@ -343,24 +353,25 @@ public:
     static constexpr auto name = props::descriptor;
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Type*() { return &value; }
+    operator Type *() { return &value; }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Type&() { return value; }
+    operator Type &() { return value; }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Type&&() && { return std::move(value); }
-    template <typename T> using cast_op_type = movable_cast_op_type<T>;
+    operator Type &&() && { return std::move(value); }
+    template <typename T>
+    using cast_op_type = movable_cast_op_type<T>;
 
 private:
     Type value;
 };
 
 // Base class for casting reference/map/block/etc. objects back to python.
-template <typename MapType> struct eigen_map_caster {
+template <typename MapType>
+struct eigen_map_caster {
 private:
     using props = EigenProps<MapType>;
 
 public:
-
     // Directly referencing a ref/map's data is a bit dangerous (whatever the map/ref points to has
     // to stay around), but we'll allow it under the assumption that you know what you're doing (and
     // have an appropriate keep_alive in place).  We return a numpy array pointing directly at the
@@ -390,28 +401,30 @@ public:
     // you end up here if you try anyway.
     bool load(handle, bool) = delete;
     operator MapType() = delete;
-    template <typename> using cast_op_type = MapType;
+    template <typename>
+    using cast_op_type = MapType;
 };
 
 // We can return any map-like object (but can only load Refs, specialized next):
-template <typename Type> struct type_caster<Type, enable_if_t<is_eigen_dense_map<Type>::value>>
-    : eigen_map_caster<Type> {};
+template <typename Type>
+struct type_caster<Type, enable_if_t<is_eigen_dense_map<Type>::value>> : eigen_map_caster<Type> {};
 
 // Loader for Ref<...> arguments.  See the documentation for info on how to make this work without
 // copying (it requires some extra effort in many cases).
 template <typename PlainObjectType, typename StrideType>
-struct type_caster<
-    Eigen::Ref<PlainObjectType, 0, StrideType>,
-    enable_if_t<is_eigen_dense_map<Eigen::Ref<PlainObjectType, 0, StrideType>>::value>
-> : public eigen_map_caster<Eigen::Ref<PlainObjectType, 0, StrideType>> {
+struct type_caster<Eigen::Ref<PlainObjectType, 0, StrideType>,
+                   enable_if_t<is_eigen_dense_map<Eigen::Ref<PlainObjectType, 0, StrideType>>::value>>
+    : public eigen_map_caster<Eigen::Ref<PlainObjectType, 0, StrideType>> {
 private:
     using Type = Eigen::Ref<PlainObjectType, 0, StrideType>;
     using props = EigenProps<Type>;
     using Scalar = typename props::Scalar;
     using MapType = Eigen::Map<PlainObjectType, 0, StrideType>;
-    using Array = array_t<Scalar, array::forcecast |
-                ((props::row_major ? props::inner_stride : props::outer_stride) == 1 ? array::c_style :
-                 (props::row_major ? props::outer_stride : props::inner_stride) == 1 ? array::f_style : 0)>;
+    using Array = array_t<Scalar,
+                          array::forcecast
+                              | ((props::row_major ? props::inner_stride : props::outer_stride) == 1   ? array::c_style
+                                 : (props::row_major ? props::outer_stride : props::inner_stride) == 1 ? array::f_style
+                                                                                                       : 0)>;
     static constexpr bool need_writeable = is_eigen_mutable_map<Type>::value;
     // Delay construction (these have no default constructor)
     std::unique_ptr<MapType> map;
@@ -423,6 +436,7 @@ private:
     // storage order conversion.  (Note that we refuse to use this temporary copy when loading an
     // argument for a Ref<M> with M non-const, i.e. a read-write reference).
     Array copy_or_ref;
+
 public:
     bool load(handle src, bool convert) {
         // First check whether what we have is already an array of the right type.  If not, we can't
@@ -437,13 +451,13 @@ public:
 
             if (aref && (!need_writeable || aref.writeable())) {
                 fits = props::conformable(aref);
-                if (!fits) return false; // Incompatible dimensions
+                if (!fits)
+                    return false; // Incompatible dimensions
                 if (!fits.template stride_compatible<props>())
                     need_copy = true;
                 else
                     copy_or_ref = std::move(aref);
-            }
-            else {
+            } else {
                 need_copy = true;
             }
         }
@@ -452,10 +466,12 @@ public:
             // We need to copy: If we need a mutable reference, or we're not supposed to convert
             // (either because we're in the no-convert overload pass, or because we're explicitly
             // instructed not to copy (via `py::arg().noconvert()`) we have to fail loading.
-            if (!convert || need_writeable) return false;
+            if (!convert || need_writeable)
+                return false;
 
             Array copy = Array::ensure(src);
-            if (!copy) return false;
+            if (!copy)
+                return false;
             fits = props::conformable(copy);
             if (!fits || !fits.template stride_compatible<props>())
                 return false;
@@ -464,54 +480,69 @@ public:
         }
 
         ref.reset();
-        map.reset(new MapType(data(copy_or_ref), fits.rows, fits.cols, make_stride(fits.stride.outer(), fits.stride.inner())));
+        map.reset(new MapType(
+            data(copy_or_ref), fits.rows, fits.cols, make_stride(fits.stride.outer(), fits.stride.inner())));
         ref.reset(new Type(*map));
 
         return true;
     }
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Type*() { return ref.get(); }
+    operator Type *() { return ref.get(); }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator Type&() { return *ref; }
-    template <typename _T> using cast_op_type = pybind11::detail::cast_op_type<_T>;
+    operator Type &() { return *ref; }
+    template <typename _T>
+    using cast_op_type = pybind11::detail::cast_op_type<_T>;
 
 private:
     template <typename T = Type, enable_if_t<is_eigen_mutable_map<T>::value, int> = 0>
-    Scalar *data(Array &a) { return a.mutable_data(); }
+    Scalar *data(Array &a) {
+        return a.mutable_data();
+    }
 
     template <typename T = Type, enable_if_t<!is_eigen_mutable_map<T>::value, int> = 0>
-    const Scalar *data(Array &a) { return a.data(); }
+    const Scalar *data(Array &a) {
+        return a.data();
+    }
 
     // Attempt to figure out a constructor of `Stride` that will work.
     // If both strides are fixed, use a default constructor:
-    template <typename S> using stride_ctor_default = bool_constant<
-        S::InnerStrideAtCompileTime != Eigen::Dynamic && S::OuterStrideAtCompileTime != Eigen::Dynamic &&
-        std::is_default_constructible<S>::value>;
+    template <typename S>
+    using stride_ctor_default
+        = bool_constant<S::InnerStrideAtCompileTime != Eigen::Dynamic && S::OuterStrideAtCompileTime != Eigen::Dynamic
+                        && std::is_default_constructible<S>::value>;
     // Otherwise, if there is a two-index constructor, assume it is (outer,inner) like
     // Eigen::Stride, and use it:
-    template <typename S> using stride_ctor_dual = bool_constant<
-        !stride_ctor_default<S>::value && std::is_constructible<S, EigenIndex, EigenIndex>::value>;
+    template <typename S>
+    using stride_ctor_dual
+        = bool_constant<!stride_ctor_default<S>::value && std::is_constructible<S, EigenIndex, EigenIndex>::value>;
     // Otherwise, if there is a one-index constructor, and just one of the strides is dynamic, use
     // it (passing whichever stride is dynamic).
-    template <typename S> using stride_ctor_outer = bool_constant<
-        !any_of<stride_ctor_default<S>, stride_ctor_dual<S>>::value &&
-        S::OuterStrideAtCompileTime == Eigen::Dynamic && S::InnerStrideAtCompileTime != Eigen::Dynamic &&
-        std::is_constructible<S, EigenIndex>::value>;
-    template <typename S> using stride_ctor_inner = bool_constant<
-        !any_of<stride_ctor_default<S>, stride_ctor_dual<S>>::value &&
-        S::InnerStrideAtCompileTime == Eigen::Dynamic && S::OuterStrideAtCompileTime != Eigen::Dynamic &&
-        std::is_constructible<S, EigenIndex>::value>;
+    template <typename S>
+    using stride_ctor_outer = bool_constant<
+        !any_of<stride_ctor_default<S>, stride_ctor_dual<S>>::value && S::OuterStrideAtCompileTime == Eigen::Dynamic
+        && S::InnerStrideAtCompileTime != Eigen::Dynamic && std::is_constructible<S, EigenIndex>::value>;
+    template <typename S>
+    using stride_ctor_inner = bool_constant<
+        !any_of<stride_ctor_default<S>, stride_ctor_dual<S>>::value && S::InnerStrideAtCompileTime == Eigen::Dynamic
+        && S::OuterStrideAtCompileTime != Eigen::Dynamic && std::is_constructible<S, EigenIndex>::value>;
 
     template <typename S = StrideType, enable_if_t<stride_ctor_default<S>::value, int> = 0>
-    static S make_stride(EigenIndex, EigenIndex) { return S(); }
+    static S make_stride(EigenIndex, EigenIndex) {
+        return S();
+    }
     template <typename S = StrideType, enable_if_t<stride_ctor_dual<S>::value, int> = 0>
-    static S make_stride(EigenIndex outer, EigenIndex inner) { return S(outer, inner); }
+    static S make_stride(EigenIndex outer, EigenIndex inner) {
+        return S(outer, inner);
+    }
     template <typename S = StrideType, enable_if_t<stride_ctor_outer<S>::value, int> = 0>
-    static S make_stride(EigenIndex outer, EigenIndex) { return S(outer); }
+    static S make_stride(EigenIndex outer, EigenIndex) {
+        return S(outer);
+    }
     template <typename S = StrideType, enable_if_t<stride_ctor_inner<S>::value, int> = 0>
-    static S make_stride(EigenIndex, EigenIndex inner) { return S(inner); }
-
+    static S make_stride(EigenIndex, EigenIndex inner) {
+        return S(inner);
+    }
 };
 
 // type_caster for special matrix types (e.g. DiagonalMatrix), which are EigenBase, but not
@@ -523,12 +554,15 @@ struct type_caster<Type, enable_if_t<is_eigen_other<Type>::value>> {
 protected:
     using Matrix = Eigen::Matrix<typename Type::Scalar, Type::RowsAtCompileTime, Type::ColsAtCompileTime>;
     using props = EigenProps<Matrix>;
+
 public:
     static handle cast(const Type &src, return_value_policy /* policy */, handle /* parent */) {
         handle h = eigen_encapsulate<props>(new Matrix(src));
         return h;
     }
-    static handle cast(const Type *src, return_value_policy policy, handle parent) { return cast(*src, policy, parent); }
+    static handle cast(const Type *src, return_value_policy policy, handle parent) {
+        return cast(*src, policy, parent);
+    }
 
     static constexpr auto name = props::descriptor;
 
@@ -537,10 +571,11 @@ public:
     // you end up here if you try anyway.
     bool load(handle, bool) = delete;
     operator Type() = delete;
-    template <typename> using cast_op_type = Type;
+    template <typename>
+    using cast_op_type = Type;
 };
 
-template<typename Type>
+template <typename Type>
 struct type_caster<Type, enable_if_t<is_eigen_sparse<Type>::value>> {
     using Scalar = typename Type::Scalar;
     using StorageIndex = remove_reference_t<decltype(*std::declval<Type>().outerIndexPtr())>;
@@ -553,8 +588,7 @@ struct type_caster<Type, enable_if_t<is_eigen_sparse<Type>::value>> {
 
         auto obj = reinterpret_borrow<object>(src);
         object sparse_module = module_::import("scipy.sparse");
-        object matrix_type = sparse_module.attr(
-            rowMajor ? "csr_matrix" : "csc_matrix");
+        object matrix_type = sparse_module.attr(rowMajor ? "csr_matrix" : "csc_matrix");
 
         if (!type::handle_of(obj).is(matrix_type)) {
             try {
@@ -573,33 +607,33 @@ struct type_caster<Type, enable_if_t<is_eigen_sparse<Type>::value>> {
         if (!values || !innerIndices || !outerIndices)
             return false;
 
-        value = Eigen::MappedSparseMatrix<Scalar,
-                                          Type::Flags & (Eigen::RowMajor | Eigen::ColMajor),
-                                          StorageIndex>(
-            shape[0].cast<Index>(), shape[1].cast<Index>(), nnz,
-            outerIndices.mutable_data(), innerIndices.mutable_data(), values.mutable_data());
+        value = Eigen::MappedSparseMatrix<Scalar, Type::Flags &(Eigen::RowMajor | Eigen::ColMajor), StorageIndex>(
+            shape[0].cast<Index>(),
+            shape[1].cast<Index>(),
+            nnz,
+            outerIndices.mutable_data(),
+            innerIndices.mutable_data(),
+            values.mutable_data());
 
         return true;
     }
 
     static handle cast(const Type &src, return_value_policy /* policy */, handle /* parent */) {
-        const_cast<Type&>(src).makeCompressed();
+        const_cast<Type &>(src).makeCompressed();
 
-        object matrix_type = module_::import("scipy.sparse").attr(
-            rowMajor ? "csr_matrix" : "csc_matrix");
+        object matrix_type = module_::import("scipy.sparse").attr(rowMajor ? "csr_matrix" : "csc_matrix");
 
         array data(src.nonZeros(), src.valuePtr());
         array outerIndices((rowMajor ? src.rows() : src.cols()) + 1, src.outerIndexPtr());
         array innerIndices(src.nonZeros(), src.innerIndexPtr());
 
-        return matrix_type(
-            std::make_tuple(data, innerIndices, outerIndices),
-            std::make_pair(src.rows(), src.cols())
-        ).release();
+        return matrix_type(std::make_tuple(data, innerIndices, outerIndices), std::make_pair(src.rows(), src.cols()))
+            .release();
     }
 
-    PYBIND11_TYPE_CASTER(Type, _<(Type::IsRowMajor) != 0>("scipy.sparse.csr_matrix[", "scipy.sparse.csc_matrix[")
-            + npy_format_descriptor<Scalar>::name + _("]"));
+    PYBIND11_TYPE_CASTER(Type,
+                         _<(Type::IsRowMajor) != 0>("scipy.sparse.csr_matrix[", "scipy.sparse.csc_matrix[")
+                             + npy_format_descriptor<Scalar>::name + _("]"));
 };
 
 PYBIND11_NAMESPACE_END(detail)

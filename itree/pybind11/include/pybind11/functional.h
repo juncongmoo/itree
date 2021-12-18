@@ -19,13 +19,14 @@ template <typename Return, typename... Args>
 struct type_caster<std::function<Return(Args...)>> {
     using type = std::function<Return(Args...)>;
     using retval_type = conditional_t<std::is_same<Return, void>::value, void_type, Return>;
-    using function_type = Return (*) (Args...);
+    using function_type = Return (*)(Args...);
 
 public:
     bool load(handle src, bool convert) {
         if (src.is_none()) {
             // Defer accepting None to other overloads (if we aren't in convert mode):
-            if (!convert) return false;
+            if (!convert)
+                return false;
             return true;
         }
 
@@ -50,8 +51,7 @@ public:
 
                 while (rec != nullptr) {
                     if (rec->is_stateless
-                        && same_type(typeid(function_type),
-                                     *reinterpret_cast<const std::type_info *>(rec->data[1]))) {
+                        && same_type(typeid(function_type), *reinterpret_cast<const std::type_info *>(rec->data[1]))) {
                         struct capture {
                             function_type f;
                         };
@@ -73,7 +73,9 @@ public:
             // This triggers a syntax error under very special conditions (very weird indeed).
             explicit
 #endif
-            func_handle(function &&f_) noexcept : f(std::move(f_)) {}
+                func_handle(function &&f_) noexcept
+                : f(std::move(f_)) {
+            }
             func_handle(const func_handle &f_) { operator=(f_); }
             func_handle &operator=(const func_handle &f_) {
                 gil_scoped_acquire acq;
@@ -113,8 +115,9 @@ public:
         return cpp_function(std::forward<Func>(f_), policy).release();
     }
 
-    PYBIND11_TYPE_CASTER(type, _("Callable[[") + concat(make_caster<Args>::name...) + _("], ")
-                               + make_caster<retval_type>::name + _("]"));
+    PYBIND11_TYPE_CASTER(type,
+                         _("Callable[[") + concat(make_caster<Args>::name...) + _("], ")
+                             + make_caster<retval_type>::name + _("]"));
 };
 
 PYBIND11_NAMESPACE_END(detail)

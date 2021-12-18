@@ -83,7 +83,7 @@ class TestNode(unittest.TestCase):
         self.assertEqual(s, expected)
         n = itree._itree.deserialize_node_(s)
         self.assertEqual(str(fruit), str(n))
-    
+
     def get_fruit(s):
         fruit = itree.Node('fruit')
         apple = itree.Node('apple', 0, 1, {"x#": 1})
@@ -92,7 +92,6 @@ class TestNode(unittest.TestCase):
         pear = itree.Node('pear', 4, 5, {"x": 4})
         fruit.add_child(pear)
         return fruit
-
 
 
 if __name__ == '__main__':
