@@ -55,7 +55,7 @@ struct PYBIND11_EXPORT Tree {
     string repr();
     string to_dot_string(const string &);
     void deserialize(const py::str &);
-    bool __eq__(const shared_ptr<Tree>& other);
+    bool __eq__(const shared_ptr<Tree> &other);
 };
 
 shared_ptr<Tree> create_tmp_tree();

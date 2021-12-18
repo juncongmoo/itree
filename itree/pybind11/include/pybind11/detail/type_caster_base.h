@@ -32,7 +32,7 @@ PYBIND11_NAMESPACE_BEGIN(detail)
 /// Adding a patient will keep it alive up until the enclosing function returns.
 class loader_life_support {
 private:
-    loader_life_support* parent = nullptr;
+    loader_life_support *parent = nullptr;
     std::unordered_set<PyObject *> keep_alive;
 
 #if defined(WITH_THREAD)
@@ -47,9 +47,7 @@ private:
     static loader_life_support *get_stack_top() {
         return static_cast<loader_life_support *>(PYBIND11_TLS_GET_VALUE(get_stack_tls_key()));
     }
-    static void set_stack_top(loader_life_support *value) {
-        PYBIND11_TLS_REPLACE_VALUE(get_stack_tls_key(), value);
-    }
+    static void set_stack_top(loader_life_support *value) { PYBIND11_TLS_REPLACE_VALUE(get_stack_tls_key(), value); }
 #else
     // Use single global variable for stack.
     static loader_life_support **get_stack_pp() {
@@ -72,7 +70,7 @@ public:
         if (get_stack_top() != this)
             pybind11_fail("loader_life_support: internal error");
         set_stack_top(parent);
-        for (auto* item : keep_alive)
+        for (auto *item : keep_alive)
             Py_DECREF(item);
     }
 
@@ -110,7 +108,8 @@ PYBIND11_NOINLINE void all_type_info_populate(PyTypeObject *t, std::vector<type_
     for (size_t i = 0; i < check.size(); i++) {
         auto type = check[i];
         // Ignore Python2 old-style class super type:
-        if (!PyType_Check((PyObject *) type)) continue;
+        if (!PyType_Check((PyObject *) type))
+            continue;
 
         // Check `type` in the current set of registered python types:
         auto it = type_dict.find(type);
@@ -125,12 +124,15 @@ PYBIND11_NOINLINE void all_type_info_populate(PyTypeObject *t, std::vector<type_
                 // unlikely, that probably isn't worthwhile.
                 bool found = false;
                 for (auto *known : bases) {
-                    if (known == tinfo) { found = true; break; }
+                    if (known == tinfo) {
+                        found = true;
+                        break;
+                    }
                 }
-                if (!found) bases.push_back(tinfo);
+                if (!found)
+                    bases.push_back(tinfo);
             }
-        }
-        else if (type->tp_bases) {
+        } else if (type->tp_bases) {
             // It's some python type, so keep follow its bases classes to look for one or more
             // registered types
             if (i + 1 == check.size()) {
@@ -170,7 +172,7 @@ inline const std::vector<detail::type_info *> &all_type_info(PyTypeObject *type)
  * ancestors are pybind11-registered.  Throws an exception if there are multiple bases--use
  * `all_type_info` instead if you want to support multiple bases.
  */
-PYBIND11_NOINLINE detail::type_info* get_type_info(PyTypeObject *type) {
+PYBIND11_NOINLINE detail::type_info *get_type_info(PyTypeObject *type) {
     auto &bases = all_type_info(type);
     if (bases.empty())
         return nullptr;
@@ -196,8 +198,7 @@ inline detail::type_info *get_global_type_info(const std::type_index &tp) {
 }
 
 /// Return the type info for a given C++ type; on lookup failure can either throw or return nullptr.
-PYBIND11_NOINLINE detail::type_info *get_type_info(const std::type_index &tp,
-                                                          bool throw_if_missing = false) {
+PYBIND11_NOINLINE detail::type_info *get_type_info(const std::type_index &tp, bool throw_if_missing = false) {
     if (auto ltype = get_local_type_info(tp))
         return ltype;
     if (auto gtype = get_global_type_info(tp))
@@ -217,8 +218,7 @@ PYBIND11_NOINLINE handle get_type_handle(const std::type_info &tp, bool throw_if
 }
 
 // Searches the inheritance graph for a registered Python instance, using all_type_info().
-PYBIND11_NOINLINE handle find_registered_python_instance(void *src,
-                                                                const detail::type_info *tinfo) {
+PYBIND11_NOINLINE handle find_registered_python_instance(void *src, const detail::type_info *tinfo) {
     auto it_instances = get_internals().registered_instances.equal_range(src);
     for (auto it_i = it_instances.first; it_i != it_instances.second; ++it_i) {
         for (auto instance_type : detail::all_type_info(Py_TYPE(it_i->second))) {
@@ -236,10 +236,9 @@ struct value_and_holder {
     void **vh = nullptr;
 
     // Main constructor for a found value/holder:
-    value_and_holder(instance *i, const detail::type_info *type, size_t vpos, size_t index) :
-        inst{i}, index{index}, type{type},
-        vh{inst->simple_layout ? inst->simple_value_holder : &inst->nonsimple.values_and_holders[vpos]}
-    {}
+    value_and_holder(instance *i, const detail::type_info *type, size_t vpos, size_t index)
+        : inst{i}, index{index}, type{type}, vh{inst->simple_layout ? inst->simple_value_holder
+                                                                    : &inst->nonsimple.values_and_holders[vpos]} {}
 
     // Default constructor (used to signal a value-and-holder not found by get_value_and_holder())
     value_and_holder() = default;
@@ -247,19 +246,20 @@ struct value_and_holder {
     // Used for past-the-end iterator
     explicit value_and_holder(size_t index) : index{index} {}
 
-    template <typename V = void> V *&value_ptr() const {
+    template <typename V = void>
+    V *&value_ptr() const {
         return reinterpret_cast<V *&>(vh[0]);
     }
     // True if this `value_and_holder` has a non-null value pointer
     explicit operator bool() const { return value_ptr() != nullptr; }
 
-    template <typename H> H &holder() const {
+    template <typename H>
+    H &holder() const {
         return reinterpret_cast<H &>(vh[1]);
     }
     bool holder_constructed() const {
-        return inst->simple_layout
-                   ? inst->simple_holder_constructed
-                   : (inst->nonsimple.status[index] & instance::status_holder_constructed) != 0u;
+        return inst->simple_layout ? inst->simple_holder_constructed
+                                   : (inst->nonsimple.status[index] & instance::status_holder_constructed) != 0u;
     }
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void set_holder_constructed(bool v = true) {
@@ -271,9 +271,8 @@ struct value_and_holder {
             inst->nonsimple.status[index] &= (std::uint8_t) ~instance::status_holder_constructed;
     }
     bool instance_registered() const {
-        return inst->simple_layout
-            ? inst->simple_instance_registered
-            : ((inst->nonsimple.status[index] & instance::status_instance_registered) != 0);
+        return inst->simple_layout ? inst->simple_instance_registered
+                                   : ((inst->nonsimple.status[index] & instance::status_instance_registered) != 0);
     }
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void set_instance_registered(bool v = true) {
@@ -294,8 +293,7 @@ private:
     const type_vec &tinfo;
 
 public:
-    explicit values_and_holders(instance *inst)
-        : inst{inst}, tinfo(all_type_info(Py_TYPE(inst))) {}
+    explicit values_and_holders(instance *inst) : inst{inst}, tinfo(all_type_info(Py_TYPE(inst))) {}
 
     struct iterator {
     private:
@@ -304,12 +302,10 @@ public:
         value_and_holder curr;
         friend struct values_and_holders;
         iterator(instance *inst, const type_vec *tinfo)
-            : inst{inst}, types{tinfo},
-            curr(inst /* instance */,
-                 types->empty() ? nullptr : (*types)[0] /* type info */,
-                 0, /* vpos: (non-simple types only): the first vptr comes first */
-                 0 /* index */)
-        {}
+            : inst{inst}, types{tinfo}, curr(inst /* instance */,
+                                             types->empty() ? nullptr : (*types)[0] /* type info */,
+                                             0, /* vpos: (non-simple types only): the first vptr comes first */
+                                             0 /* index */) {}
         // Past-the-end iterator:
         explicit iterator(size_t end) : curr(end) {}
 
@@ -332,7 +328,8 @@ public:
 
     iterator find(const type_info *find_type) {
         auto it = begin(), endit = end();
-        while (it != endit && it->type != find_type) ++it;
+        while (it != endit && it->type != find_type)
+            ++it;
         return it;
     }
 
@@ -349,7 +346,8 @@ public:
  * The returned object should be short-lived: in particular, it must not outlive the called-upon
  * instance.
  */
-PYBIND11_NOINLINE value_and_holder instance::get_value_and_holder(const type_info *find_type /*= nullptr default in common.h*/, bool throw_if_missing /*= true in common.h*/) {
+PYBIND11_NOINLINE value_and_holder instance::get_value_and_holder(
+    const type_info *find_type /*= nullptr default in common.h*/, bool throw_if_missing /*= true in common.h*/) {
     // Optimize common case:
     if (!find_type || Py_TYPE(this) == find_type->type)
         return value_and_holder(this, find_type, 0, 0);
@@ -364,12 +362,12 @@ PYBIND11_NOINLINE value_and_holder instance::get_value_and_holder(const type_inf
 
 #if defined(NDEBUG)
     pybind11_fail("pybind11::detail::instance::get_value_and_holder: "
-            "type is not a pybind11 base of the given instance "
-            "(compile in debug mode for type details)");
+                  "type is not a pybind11 base of the given instance "
+                  "(compile in debug mode for type details)");
 #else
-    pybind11_fail("pybind11::detail::instance::get_value_and_holder: `" +
-            get_fully_qualified_tp_name(find_type->type) + "' is not a pybind11 base of the given `" +
-            get_fully_qualified_tp_name(Py_TYPE(this)) + "' instance");
+    pybind11_fail("pybind11::detail::instance::get_value_and_holder: `" + get_fully_qualified_tp_name(find_type->type)
+                  + "' is not a pybind11 base of the given `" + get_fully_qualified_tp_name(Py_TYPE(this))
+                  + "' instance");
 #endif
 }
 
@@ -381,23 +379,21 @@ PYBIND11_NOINLINE void instance::allocate_layout() {
     if (n_types == 0)
         pybind11_fail("instance allocation failed: new instance has no pybind11-registered base types");
 
-    simple_layout =
-        n_types == 1 && tinfo.front()->holder_size_in_ptrs <= instance_simple_holder_in_ptrs();
+    simple_layout = n_types == 1 && tinfo.front()->holder_size_in_ptrs <= instance_simple_holder_in_ptrs();
 
     // Simple path: no python-side multiple inheritance, and a small-enough holder
     if (simple_layout) {
         simple_value_holder[0] = nullptr;
         simple_holder_constructed = false;
         simple_instance_registered = false;
-    }
-    else { // multiple base types or a too-large holder
+    } else { // multiple base types or a too-large holder
         // Allocate space to hold: [v1*][h1][v2*][h2]...[bb...] where [vN*] is a value pointer,
         // [hN] is the (uninitialized) holder instance for value N, and [bb...] is a set of bool
         // values that tracks whether each associated holder has been initialized.  Each [block] is
         // padded, if necessary, to an integer multiple of sizeof(void *).
         size_t space = 0;
         for (auto t : tinfo) {
-            space += 1; // value pointer
+            space += 1;                      // value pointer
             space += t->holder_size_in_ptrs; // holder instance
         }
         size_t flags_at = space;
@@ -410,10 +406,12 @@ PYBIND11_NOINLINE void instance::allocate_layout() {
         // just wrappers around malloc.
 #if PY_VERSION_HEX >= 0x03050000
         nonsimple.values_and_holders = (void **) PyMem_Calloc(space, sizeof(void *));
-        if (!nonsimple.values_and_holders) throw std::bad_alloc();
+        if (!nonsimple.values_and_holders)
+            throw std::bad_alloc();
 #else
         nonsimple.values_and_holders = (void **) PyMem_New(void *, space);
-        if (!nonsimple.values_and_holders) throw std::bad_alloc();
+        if (!nonsimple.values_and_holders)
+            throw std::bad_alloc();
         std::memset(nonsimple.values_and_holders, 0, space * sizeof(void *));
 #endif
         nonsimple.status = reinterpret_cast<std::uint8_t *>(&nonsimple.values_and_holders[flags_at]);
@@ -468,17 +466,15 @@ PYBIND11_NOINLINE std::string error_string() {
         PyFrameObject *frame = trace->tb_frame;
         errorString += "\n\nAt:\n";
         while (frame) {
-#if PY_VERSION_HEX >= 0x03090000
+#    if PY_VERSION_HEX >= 0x03090000
             PyCodeObject *f_code = PyFrame_GetCode(frame);
-#else
+#    else
             PyCodeObject *f_code = frame->f_code;
             Py_INCREF(f_code);
-#endif
+#    endif
             int lineno = PyFrame_GetLineNumber(frame);
-            errorString +=
-                "  " + handle(f_code->co_filename).cast<std::string>() +
-                "(" + std::to_string(lineno) + "): " +
-                handle(f_code->co_name).cast<std::string>() + "\n";
+            errorString += "  " + handle(f_code->co_filename).cast<std::string>() + "(" + std::to_string(lineno)
+                           + "): " + handle(f_code->co_name).cast<std::string>() + "\n";
             frame = frame->f_back;
             Py_DECREF(f_code);
         }
@@ -488,7 +484,7 @@ PYBIND11_NOINLINE std::string error_string() {
     return errorString;
 }
 
-PYBIND11_NOINLINE handle get_object_handle(const void *ptr, const detail::type_info *type ) {
+PYBIND11_NOINLINE handle get_object_handle(const void *ptr, const detail::type_info *type) {
     auto &instances = get_internals().registered_instances;
     auto range = instances.equal_range(ptr);
     for (auto it = range.first; it != range.second; ++it) {
@@ -506,9 +502,9 @@ inline PyThreadState *get_thread_state_unchecked() {
 #elif PY_VERSION_HEX < 0x03000000
     return _PyThreadState_Current;
 #elif PY_VERSION_HEX < 0x03050000
-    return (PyThreadState*) _Py_atomic_load_relaxed(&_PyThreadState_Current);
+    return (PyThreadState *) _Py_atomic_load_relaxed(&_PyThreadState_Current);
 #elif PY_VERSION_HEX < 0x03050200
-    return (PyThreadState*) _PyThreadState_Current.value;
+    return (PyThreadState *) _PyThreadState_Current.value;
 #else
     return _PyThreadState_UncheckedGet();
 #endif
@@ -526,11 +522,11 @@ public:
     explicit type_caster_generic(const type_info *typeinfo)
         : typeinfo(typeinfo), cpptype(typeinfo ? typeinfo->cpptype : nullptr) {}
 
-    bool load(handle src, bool convert) {
-        return load_impl<type_caster_generic>(src, convert);
-    }
+    bool load(handle src, bool convert) { return load_impl<type_caster_generic>(src, convert); }
 
-    PYBIND11_NOINLINE static handle cast(const void *_src, return_value_policy policy, handle parent,
+    PYBIND11_NOINLINE static handle cast(const void *_src,
+                                         return_value_policy policy,
+                                         handle parent,
                                          const detail::type_info *tinfo,
                                          void *(*copy_constructor)(const void *),
                                          void *(*move_constructor)(const void *),
@@ -573,8 +569,7 @@ public:
 #else
                     std::string type_name(tinfo->cpptype->name());
                     detail::clean_type_id(type_name);
-                    throw cast_error("return_value_policy = copy, but type " +
-                                     type_name + " is non-copyable!");
+                    throw cast_error("return_value_policy = copy, but type " + type_name + " is non-copyable!");
 #endif
                 }
                 wrapper->owned = true;
@@ -593,8 +588,8 @@ public:
 #else
                     std::string type_name(tinfo->cpptype->name());
                     detail::clean_type_id(type_name);
-                    throw cast_error("return_value_policy = move, but type " +
-                                     type_name + " is neither movable nor copyable!");
+                    throw cast_error("return_value_policy = move, but type " + type_name
+                                     + " is neither movable nor copyable!");
 #endif
                 }
                 wrapper->owned = true;
@@ -624,13 +619,12 @@ public:
             if (type->operator_new) {
                 vptr = type->operator_new(type->type_size);
             } else {
-                #if defined(__cpp_aligned_new) && (!defined(_MSC_VER) || _MSC_VER >= 1912)
-                    if (type->type_align > __STDCPP_DEFAULT_NEW_ALIGNMENT__)
-                        vptr = ::operator new(type->type_size,
-                                              std::align_val_t(type->type_align));
-                    else
-                #endif
-                vptr = ::operator new(type->type_size);
+#if defined(__cpp_aligned_new) && (!defined(_MSC_VER) || _MSC_VER >= 1912)
+                if (type->type_align > __STDCPP_DEFAULT_NEW_ALIGNMENT__)
+                    vptr = ::operator new(type->type_size, std::align_val_t(type->type_align));
+                else
+#endif
+                    vptr = ::operator new(type->type_size);
             }
         }
         value = vptr;
@@ -687,8 +681,10 @@ public:
     // logic (without having to resort to virtual inheritance).
     template <typename ThisT>
     PYBIND11_NOINLINE bool load_impl(handle src, bool convert) {
-        if (!src) return false;
-        if (!typeinfo) return try_load_foreign_module_local(src);
+        if (!src)
+            return false;
+        if (!typeinfo)
+            return try_load_foreign_module_local(src);
 
         auto &this_ = static_cast<ThisT &>(*this);
         this_.check_holder_compat();
@@ -758,26 +754,26 @@ public:
 
         // Global typeinfo has precedence over foreign module_local
         if (try_load_foreign_module_local(src)) {
-           return true;
+            return true;
         }
 
         // Custom converters didn't take None, now we convert None to nullptr.
         if (src.is_none()) {
-           // Defer accepting None to other overloads (if we aren't in convert mode):
-           if (!convert) return false;
-           value = nullptr;
-           return true;
+            // Defer accepting None to other overloads (if we aren't in convert mode):
+            if (!convert)
+                return false;
+            value = nullptr;
+            return true;
         }
 
         return false;
     }
 
-
     // Called to do type lookup and wrap the pointer and type in a pair when a dynamic_cast
     // isn't needed or can't be used.  If the type is unknown, sets the error and returns a pair
     // with .second = nullptr.  (p.first = nullptr is not an error: it becomes None).
-    PYBIND11_NOINLINE static std::pair<const void *, const type_info *> src_and_type(
-            const void *src, const std::type_info &cast_type, const std::type_info *rtti_type = nullptr) {
+    PYBIND11_NOINLINE static std::pair<const void *, const type_info *>
+    src_and_type(const void *src, const std::type_info &cast_type, const std::type_info *rtti_type = nullptr) {
         if (auto *tpi = get_type_info(cast_type))
             return {src, const_cast<const type_info *>(tpi)};
 
@@ -802,10 +798,9 @@ public:
  * `movable_cast_op_type` instead.
  */
 template <typename T>
-using cast_op_type =
-    conditional_t<std::is_pointer<remove_reference_t<T>>::value,
-        typename std::add_pointer<intrinsic_t<T>>::type,
-        typename std::add_lvalue_reference<intrinsic_t<T>>::type>;
+using cast_op_type = conditional_t<std::is_pointer<remove_reference_t<T>>::value,
+                                   typename std::add_pointer<intrinsic_t<T>>::type,
+                                   typename std::add_lvalue_reference<intrinsic_t<T>>::type>;
 
 /**
  * Determine suitable casting operator for a type caster with a movable value.  Such a type caster
@@ -815,41 +810,46 @@ using cast_op_type =
  * These operator are automatically provided when using the PYBIND11_TYPE_CASTER macro.
  */
 template <typename T>
-using movable_cast_op_type =
-    conditional_t<std::is_pointer<typename std::remove_reference<T>::type>::value,
-        typename std::add_pointer<intrinsic_t<T>>::type,
-    conditional_t<std::is_rvalue_reference<T>::value,
-        typename std::add_rvalue_reference<intrinsic_t<T>>::type,
-        typename std::add_lvalue_reference<intrinsic_t<T>>::type>>;
+using movable_cast_op_type = conditional_t<std::is_pointer<typename std::remove_reference<T>::type>::value,
+                                           typename std::add_pointer<intrinsic_t<T>>::type,
+                                           conditional_t<std::is_rvalue_reference<T>::value,
+                                                         typename std::add_rvalue_reference<intrinsic_t<T>>::type,
+                                                         typename std::add_lvalue_reference<intrinsic_t<T>>::type>>;
 
 // std::is_copy_constructible isn't quite enough: it lets std::vector<T> (and similar) through when
 // T is non-copyable, but code containing such a copy constructor fails to actually compile.
-template <typename T, typename SFINAE = void> struct is_copy_constructible : std::is_copy_constructible<T> {};
+template <typename T, typename SFINAE = void>
+struct is_copy_constructible : std::is_copy_constructible<T> {};
 
 // Specialization for types that appear to be copy constructible but also look like stl containers
 // (we specifically check for: has `value_type` and `reference` with `reference = value_type&`): if
 // so, copy constructability depends on whether the value_type is copy constructible.
-template <typename Container> struct is_copy_constructible<Container, enable_if_t<all_of<
-        std::is_copy_constructible<Container>,
-        std::is_same<typename Container::value_type &, typename Container::reference>,
-        // Avoid infinite recursion
-        negation<std::is_same<Container, typename Container::value_type>>
-    >::value>> : is_copy_constructible<typename Container::value_type> {};
+template <typename Container>
+struct is_copy_constructible<
+    Container,
+    enable_if_t<all_of<std::is_copy_constructible<Container>,
+                       std::is_same<typename Container::value_type &, typename Container::reference>,
+                       // Avoid infinite recursion
+                       negation<std::is_same<Container, typename Container::value_type>>>::value>>
+    : is_copy_constructible<typename Container::value_type> {};
 
 // Likewise for std::pair
 // (after C++17 it is mandatory that the copy constructor not exist when the two types aren't themselves
 // copy constructible, but this can not be relied upon when T1 or T2 are themselves containers).
-template <typename T1, typename T2> struct is_copy_constructible<std::pair<T1, T2>>
-    : all_of<is_copy_constructible<T1>, is_copy_constructible<T2>> {};
+template <typename T1, typename T2>
+struct is_copy_constructible<std::pair<T1, T2>> : all_of<is_copy_constructible<T1>, is_copy_constructible<T2>> {};
 
 // The same problems arise with std::is_copy_assignable, so we use the same workaround.
-template <typename T, typename SFINAE = void> struct is_copy_assignable : std::is_copy_assignable<T> {};
-template <typename Container> struct is_copy_assignable<Container, enable_if_t<all_of<
-        std::is_copy_assignable<Container>,
-        std::is_same<typename Container::value_type &, typename Container::reference>
-    >::value>> : is_copy_assignable<typename Container::value_type> {};
-template <typename T1, typename T2> struct is_copy_assignable<std::pair<T1, T2>>
-    : all_of<is_copy_assignable<T1>, is_copy_assignable<T2>> {};
+template <typename T, typename SFINAE = void>
+struct is_copy_assignable : std::is_copy_assignable<T> {};
+template <typename Container>
+struct is_copy_assignable<
+    Container,
+    enable_if_t<all_of<std::is_copy_assignable<Container>,
+                       std::is_same<typename Container::value_type &, typename Container::reference>>::value>>
+    : is_copy_assignable<typename Container::value_type> {};
+template <typename T1, typename T2>
+struct is_copy_assignable<std::pair<T1, T2>> : all_of<is_copy_assignable<T1>, is_copy_assignable<T2>> {};
 
 PYBIND11_NAMESPACE_END(detail)
 
@@ -875,16 +875,14 @@ PYBIND11_NAMESPACE_END(detail)
 // std::enable_if. User provided specializations will always have higher priority than
 // the default implementation and specialization provided in polymorphic_type_hook_base.
 template <typename itype, typename SFINAE = void>
-struct polymorphic_type_hook_base
-{
-    static const void *get(const itype *src, const std::type_info*&) { return src; }
+struct polymorphic_type_hook_base {
+    static const void *get(const itype *src, const std::type_info *&) { return src; }
 };
 template <typename itype>
-struct polymorphic_type_hook_base<itype, detail::enable_if_t<std::is_polymorphic<itype>::value>>
-{
-    static const void *get(const itype *src, const std::type_info*& type) {
+struct polymorphic_type_hook_base<itype, detail::enable_if_t<std::is_polymorphic<itype>::value>> {
+    static const void *get(const itype *src, const std::type_info *&type) {
         type = src ? &typeid(*src) : nullptr;
-        return dynamic_cast<const void*>(src);
+        return dynamic_cast<const void *>(src);
     }
 };
 template <typename itype, typename SFINAE = void>
@@ -893,14 +891,15 @@ struct polymorphic_type_hook : public polymorphic_type_hook_base<itype> {};
 PYBIND11_NAMESPACE_BEGIN(detail)
 
 /// Generic type caster for objects stored on the heap
-template <typename type> class type_caster_base : public type_caster_generic {
+template <typename type>
+class type_caster_base : public type_caster_generic {
     using itype = intrinsic_t<type>;
 
 public:
     static constexpr auto name = _<type>();
 
-    type_caster_base() : type_caster_base(typeid(type)) { }
-    explicit type_caster_base(const std::type_info &info) : type_caster_generic(info) { }
+    type_caster_base() : type_caster_base(typeid(type)) {}
+    explicit type_caster_base(const std::type_info &info) : type_caster_generic(info) {}
 
     static handle cast(const itype &src, return_value_policy policy, handle parent) {
         if (policy == return_value_policy::automatic || policy == return_value_policy::automatic_reference)
@@ -939,39 +938,40 @@ public:
     static handle cast(const itype *src, return_value_policy policy, handle parent) {
         auto st = src_and_type(src);
         return type_caster_generic::cast(
-            st.first, policy, parent, st.second,
-            make_copy_constructor(src), make_move_constructor(src));
+            st.first, policy, parent, st.second, make_copy_constructor(src), make_move_constructor(src));
     }
 
     static handle cast_holder(const itype *src, const void *holder) {
         auto st = src_and_type(src);
         return type_caster_generic::cast(
-            st.first, return_value_policy::take_ownership, {}, st.second,
-            nullptr, nullptr, holder);
+            st.first, return_value_policy::take_ownership, {}, st.second, nullptr, nullptr, holder);
     }
 
-    template <typename T> using cast_op_type = detail::cast_op_type<T>;
+    template <typename T>
+    using cast_op_type = detail::cast_op_type<T>;
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator itype*() { return (type *) value; }
+    operator itype *() { return (type *) value; }
     // NOLINTNEXTLINE(google-explicit-constructor)
-    operator itype&() { if (!value) throw reference_cast_error(); return *((itype *) value); }
+    operator itype &() {
+        if (!value)
+            throw reference_cast_error();
+        return *((itype *) value);
+    }
 
 protected:
-    using Constructor = void *(*)(const void *);
+    using Constructor = void *(*) (const void *);
 
     /* Only enabled when the types are {copy,move}-constructible *and* when the type
        does not have a private operator new implementation. A comma operator is used in the decltype
        argument to apply SFINAE to the public copy/move constructors.*/
     template <typename T, typename = enable_if_t<is_copy_constructible<T>::value>>
     static auto make_copy_constructor(const T *) -> decltype(new T(std::declval<const T>()), Constructor{}) {
-        return [](const void *arg) -> void * {
-            return new T(*reinterpret_cast<const T *>(arg));
-        };
+        return [](const void *arg) -> void * { return new T(*reinterpret_cast<const T *>(arg)); };
     }
 
     template <typename T, typename = enable_if_t<std::is_move_constructible<T>::value>>
-    static auto make_move_constructor(const T *) -> decltype(new T(std::declval<T&&>()), Constructor{}) {
+    static auto make_move_constructor(const T *) -> decltype(new T(std::declval<T &&>()), Constructor{}) {
         return [](const void *arg) -> void * {
             return new T(std::move(*const_cast<T *>(reinterpret_cast<const T *>(arg))));
         };
