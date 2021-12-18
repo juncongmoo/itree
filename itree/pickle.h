@@ -22,7 +22,7 @@ shared_ptr<Node> deserialize_node_impl(const string &d);
 
 py::str serialize_tree_(const shared_ptr<Tree> &n);
 shared_ptr<Tree> deserialize_tree_(py::str bs);
-void _deserialize_tree(Tree* tree, py::str bs);
+void _deserialize_tree(Tree *tree, py::str bs);
 
 py::str serialize_forest_(const ForestStats &);
 ForestStats deserialize_forest_(const py::str &bs);

@@ -56,7 +56,7 @@ class TestTree(unittest.TestCase):
 
     def test_deserialization(self):
         x = demo_tree()
-        
+
         tree = itree.create_tmp_tree()
         d1 = "t1^123,,0,11,6,1,1e-07,25#{'img': '1241241313.png'}%n1*[None,inf,inf,0$0#[root,1.0,1628400570.8713503,0$17#{'name': 'itree'}[math,2.0,16284000.0,0$32#{'age': 10, 'memory': (1, 2, 3)}[music,3.0,4.0,0$38#{'location': [1, 2, 3], 'price': 12.3}]][music,122840057.8713503,1228400500.0,0$0#][music,32840057.8713503,628400500.0,0$0#[egg,3284.8713503,6284500.0,0$0#[icecream,32843.8713503,62845003.0,0$0#[pizza,32843.8713503,62845003.0,0$0#]]]][piggy,3284.8713503,6284500.0,0$0#[unicorn,32843.8713503,62845003.0,0$0#[monkey,32843.8713503,62845003.0,0$0#]]]]]"
         tree.deserialize(d1)
