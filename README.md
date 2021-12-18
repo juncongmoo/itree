@@ -114,7 +114,7 @@ OK
 
 ```bash
 find itree -path itree/pybind11 -prune -o -iname *.h -o -iname *.cpp | xargs clang-format -i
-black -S . --exclude '(\.history|workspace|pybind11|\.vscode|\.git|\.VSCodeCounter|img|venv|.ansible|.cache|.local|.vim)'
+black -S . --exclude '(\.history|\.vscode|\.git|\.VSCodeCounter|venv|workspace|pybind11)'
 ```
 
 - Build
