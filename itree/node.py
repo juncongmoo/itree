@@ -80,7 +80,7 @@ def create_virtual_node() -> Node:
 
 
 def _consolidate(node: Node):
-    if isinstance(node, Node):
+    if isinstance(node, (Node, _itree.Node)):
         n = _itree.consolidate(node)
         if len(n.nodes) == 1:
             return n.nodes[0]
