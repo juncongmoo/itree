@@ -113,8 +113,8 @@ OK
 - Format
 
 ```bash
-find itree -iname *.h -o -iname *.cpp | xargs clang-format -i
-black -S . --exclude '(gcc|infer|\.history|workspace|vendor|\.vscode|\.git|\.VSCodeCounter|img|venv|.ansible|.cache|.local|.vim)'
+find itree -path itree/pybind11 -prune -o -iname *.h -o -iname *.cpp | xargs clang-format -i
+black -S . --exclude '(\.history|workspace|pybind11|\.vscode|\.git|\.VSCodeCounter|img|venv|.ansible|.cache|.local|.vim)'
 ```
 
 - Build
