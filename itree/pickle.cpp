@@ -4,19 +4,16 @@ namespace py = pybind11;
 using namespace std;
 using namespace pybind11::literals;
 
-// this will cause core dump
-// const static auto ast = py::module::import("ast");
-
 py::str run_length_dict(const py::dict &d) {
     if (d.empty())
-        return py::str("0#", 2);
+        return py::str("0\x07", 2);
     auto extra_ = d.cast<py::str>();
-    extra_ = "{}#{}"_s.format(py::len(extra_), extra_);
+    extra_ = "{}\x07{}"_s.format(py::len(extra_), extra_);
     return extra_;
 }
 
 py::dict str_to_dict(const string &dict_str) {
-    if (dict_str == "0#")
+    if (dict_str == "0\x07")
         return py::dict();
     auto ast = py::module::import("ast");
     auto vs = split(dict_str, "#", 1);
@@ -54,11 +51,11 @@ py::str serialize_node_impl(const shared_ptr<Node> &n, py::str &s) {
 
 py::str serialize_tree_(const shared_ptr<Tree> &n) {
     auto run_length_extra = run_length_dict(n->extra);
-    // py::str s = "t1^{tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}"_s.format(
-    py::str s = "t1^{},{},{},{},{},{},{},{}"_s.format(
+    // py::str s = "t1\x05{tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}"_s.format(
+    py::str s = "t1\x05{},{},{},{},{},{},{},{}"_s.format(
         n->tid, n->pid, n->mode, n->count, n->depth, int(n->monotonic), n->zin_threshold, run_length_extra);
     py::str ns = serialize_node_(n->root);
-    return "{}%{}"_s.format(s, ns);
+    return "{}\x06{}"_s.format(s, ns);
 }
 
 shared_ptr<Node> deserialize_node_(py::str bs) {
@@ -100,7 +97,7 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
                 stk_.back()->append(t);
                 stk_.push_back(t);
             }
-        } else if (ch == '$') {
+        } else if (int(ch) == 8) {
             vector<string> kv = split(s, ",");
             // py::print("kv:", kv[0], kv[1], kv[2], kv[3]);
             stk_.back()->name = kv[0];
@@ -111,7 +108,7 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
             string tmp = d.substr(i + 1);
             // cout << "i+1:" << i + 1 << endl;
             // cout << "tmp:" << tmp << endl;
-            auto vs = split(tmp, "#", 1);
+            auto vs = split(tmp, "\x07", 1);
             // cout << "tmp:" << vs.size() << endl;
             string extra_len_str = vs[0], remaining = vs[1];
             // py::print("extra_len_str", py::str(extra_len_str));
@@ -147,8 +144,8 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     if (d[0] != 't') {
         throw invalid_argument(d);
     }
-    auto v1 = split(d, "%", 1);
-    auto v2 = split(v1[0], "^", 1);
+    auto v1 = split(d, "\x06", 1);
+    auto v2 = split(v1[0], "\x05", 1);
     int version = stoi(v2[0].substr(1));
     assert(version == 1);
     // py::print(version);

@@ -52,7 +52,7 @@ class TestNode(unittest.TestCase):
         fruit = self.get_fruit()
 
         s = itree.serialize_node(fruit)
-        expected = "n1*[fruit,0.0,100.0,0$0#[apple,0.0,1.0,0$9#{'x#': 1}][pear,4.0,5.0,0$8#{'x': 4}]]"
+        expected = "n1*[fruit,0.0,100.0,0\x080\x07[apple,0.0,1.0,0\x089\x07{'x#': 1}][pear,4.0,5.0,0\x088\x07{'x': 4}]]"
         self.assertEqual(s, expected)
         n = itree._itree.deserialize_node_(s)
         self.assertEqual(str(fruit), str(n))
@@ -61,7 +61,7 @@ class TestNode(unittest.TestCase):
         fruit = self.get_fruit()
 
         s = itree._itree.serialize_node_(fruit)
-        expected = "n1*[fruit,0.0,100.0,0$0#[apple,0.0,1.0,0$9#{'x#': 1}][pear,4.0,5.0,0$8#{'x': 4}]]"
+        expected = "n1*[fruit,0.0,100.0,0\x080\x07[apple,0.0,1.0,0\x089\x07{'x#': 1}][pear,4.0,5.0,0\x088\x07{'x': 4}]]"
         self.assertEqual(s, expected)
         n = itree.deserialize_node(s)
         self.assertEqual(str(fruit), str(n))
@@ -70,7 +70,7 @@ class TestNode(unittest.TestCase):
         fruit = self.get_fruit()
 
         s = itree.serialize_node(fruit)
-        expected = "n1*[fruit,0.0,100.0,0$0#[apple,0.0,1.0,0$9#{'x#': 1}][pear,4.0,5.0,0$8#{'x': 4}]]"
+        expected = "n1*[fruit,0.0,100.0,0\x080\x07[apple,0.0,1.0,0\x089\x07{'x#': 1}][pear,4.0,5.0,0\x088\x07{'x': 4}]]"
         self.assertEqual(s, expected)
         n = itree.deserialize_node(s)
         self.assertEqual(str(fruit), str(n))
@@ -79,7 +79,7 @@ class TestNode(unittest.TestCase):
         fruit = self.get_fruit()
 
         s = itree._itree.serialize_node_(fruit)
-        expected = "n1*[fruit,0.0,100.0,0$0#[apple,0.0,1.0,0$9#{'x#': 1}][pear,4.0,5.0,0$8#{'x': 4}]]"
+        expected = "n1*[fruit,0.0,100.0,0\x080\x07[apple,0.0,1.0,0\x089\x07{'x#': 1}][pear,4.0,5.0,0\x088\x07{'x': 4}]]"
         self.assertEqual(s, expected)
         n = itree._itree.deserialize_node_(s)
         self.assertEqual(str(fruit), str(n))
