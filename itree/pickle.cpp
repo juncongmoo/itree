@@ -19,7 +19,7 @@ py::dict str_to_dict(const string &dict_str) {
     if (dict_str == "0#")
         return py::dict();
     auto ast = py::module::import("ast");
-    auto vs = split(dict_str, "#");
+    auto vs = split(dict_str, "#", 1);
     try{
         return ast.attr("literal_eval")(vs[1]);
     }catch(const std::exception &e){
@@ -38,17 +38,17 @@ py::str serialize_node_impl(const shared_ptr<Node> &n, py::str &s) {
     if (n != nullptr) {
         py::str extra_ = run_length_dict(n->extra);
         auto tmp = "{},{},{},{}${}"_s.format(n->name, n->start, n->end, n->nid, extra_);
-        //py::print(tmp);
+        // py::print(tmp);
         // s += py::str("{", 1) + tmp;
         s = "{}[{}"_s.format(s, tmp);
-        //py::print(123);
-        //py::print(s);
+        // py::print(123);
+        // py::print(s);
         for (auto i = n->nodes.begin(); i != n->nodes.end(); i++)
             s = serialize_node_impl(*i, s);
         // s += py::str("]", 1);
         s = "{}]"_s.format(s);
     }
-    //py::print(s);
+    // py::print(s);
     return s;
 }
 
@@ -69,11 +69,11 @@ shared_ptr<Node> deserialize_node_(py::str bs) {
         throw invalid_argument(d);
     }
     string version_str = d.substr(1, i - 1);
-    // //py::print("version_strxxxxxxxxxxx:", version_str);
+    // py::print("version_strxxxxxxxxxxx:", version_str);
     int version = stoi(version_str);
     assert(version == 1);
-    // //py::print("--------------------------------");
-    // //py::print("version:", version);
+    // py::print("--------------------------------");
+    // py::print("version:", version);
     return deserialize_node_impl(d.substr(i + 1));
 }
 
@@ -82,14 +82,14 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
     vector<shared_ptr<Node>> stk_ = {create_virtual_node_()};
     // auto ss = "{'name': 'World', 'number': 42, 'x': {'name': 'W', 'number': 4}}";
     // py::dict z = ast.attr("literal_eval")(ss);
-    // //py::print(z);
-    //py::print("vvvvvvvvvvvvvv");
+    // py::print(z);
+    // py::print("vvvvvvvvvvvvvv");
     // return nullptr;
     string s;
     size_t i = 0;
     // cout << "d:" << d << endl;
     while (i < d.size()) {
-        //py::print(py::str(to_string(i)));
+        // py::print(py::str(to_string(i)));
         auto ch = d[i];
         if (ch == '[') {
             if (stk_.size() == 1) {
@@ -102,7 +102,7 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
             }
         } else if (ch == '$') {
             vector<string> kv = split(s, ",");
-            // //py::print("kv:", kv[0], kv[1], kv[2], kv[3]);
+            // py::print("kv:", kv[0], kv[1], kv[2], kv[3]);
             stk_.back()->name = kv[0];
             stk_.back()->start = stod(kv[1]);
             stk_.back()->end = stod(kv[2]);
@@ -114,11 +114,11 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
             auto vs = split(tmp, "#", 1);
             // cout << "tmp:" << vs.size() << endl;
             string extra_len_str = vs[0], remaining = vs[1];
-            // //py::print("extra_len_str", py::str(extra_len_str));
+            // py::print("extra_len_str", py::str(extra_len_str));
             int extra_len = stoi(extra_len_str);
             if (extra_len > 0) {
                 string dict_str = remaining.substr(0, extra_len);
-                // //py::print(py::str(dict_str));
+                // py::print(py::str(dict_str));
                 stk_.back()->extra = ast.attr("literal_eval")(dict_str);
             }
             i += extra_len + 1 + extra_len_str.size() + 1;
@@ -132,14 +132,14 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
         }
         i++;
     }
-    // //py::print("vvvvvvvvvvvvvv");
+    // py::print("vvvvvvvvvvvvvv");
     // auto r = consolidate(stk_.front());
-    //py::print(stk_.front()->nodes.front());
+    // py::print(stk_.front()->nodes.front());
     return stk_.front()->nodes.front();
 }
 
 shared_ptr<Tree> deserialize_tree_(py::str bs) {
-    // //py::print(bs);
+    // py::print(bs);
     string d = static_cast<std::string>(bs);
     auto tree = create_tmp_tree();
     if (d.empty())
@@ -151,10 +151,10 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     auto v2 = split(v1[0], "^", 1);
     int version = stoi(v2[0].substr(1));
     assert(version == 1);
-    // //py::print(version);
+    // py::print(version);
     auto v3 = split(v2[1], ",", 7);
     // {tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}
-    // //py::print("gg:", v3[0], v3[1], v3[2], v3[3], v3[4], v3[5], v3[6], v3[7]);
+    // py::print("gg:", v3[0], v3[1], v3[2], v3[3], v3[4], v3[5], v3[6], v3[7]);
     tree->tid = v3[0];
     tree->pid = v3[1];
     tree->mode = stoi(v3[2]);
@@ -162,50 +162,54 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     tree->depth = stoi(v3[4]);
     tree->monotonic = stoi(v3[5]);
     tree->zin_threshold = stod(v3[6]);
-    // //py::print("tree->zin_threshold:", tree->zin_threshold);
-    // //py::print("v3[7]:", v3[7]);
+    // py::print("tree->zin_threshold:", tree->zin_threshold);
+    // py::print("v3[7]:", v3[7]);
     tree->extra = str_to_dict(v3[7]);
 
-    //py::print("v1[1]:", v1[1]);
+    // py::print("v1[1]:", v1[1]);
     shared_ptr<Node> root = deserialize_node_(v1[1]);
     tree->root = root;
     return tree;
 }
 
 void _deserialize_tree(Tree* tree, py::str bs) {
-    // //py::print(bs);
+    // py::print(bs);
     string d = static_cast<std::string>(bs);
     if (d.empty())
         return;
     if (d[0] != 't') {
         throw invalid_argument(d);
     }
-    auto v1 = split(d, "%", 1);
-    auto v2 = split(v1[0], "^", 1);
-    int version = stoi(v2[0].substr(1));
+    auto v = split(d, ",", 7);
+    auto v1 = split(v[0], "^");
+    int version = stoi(v1[0].substr(1));
     assert(version == 1);
-    // //py::print(version);
-    auto v3 = split(v2[1], ",", 7);
-    // {tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}
-    // //py::print("gg:", v3[0], v3[1], v3[2], v3[3], v3[4], v3[5], v3[6], v3[7]);
-    tree->tid = v3[0];
-    tree->pid = v3[1];
-    tree->mode = stoi(v3[2]);
-    tree->count = stoi(v3[3]);
-    tree->depth = stoi(v3[4]);
-    tree->monotonic = stoi(v3[5]);
-    tree->zin_threshold = stod(v3[6]);
-    // //py::print("tree->zin_threshold:", tree->zin_threshold);
-    // //py::print("v3[7]:", v3[7]);
-    tree->extra = str_to_dict(v3[7]);
+
+    tree->tid = v1[1];
+    tree->pid = v[1];
+    tree->mode = stoi(v[2]);
+    tree->count = stoi(v[3]);
+    tree->depth = stoi(v[4]);
+    tree->monotonic = stoi(v[5]);
+    tree->zin_threshold = stod(v[6]);
+    string& t = v[7];
+    auto v2 = split(t, "#", 1);
+    int run_len = stoi(v2[0]);
+    // py::print("run_len", run_len);
+    auto dict_ = v2[1].substr(0, run_len);
+    // py::print("dict_", dict_);
+    auto ast = py::module::import("ast");
+    tree->extra = ast.attr("literal_eval")(dict_);
+    auto rest = v2[1].substr(run_len+1);
+    assert(v2[1][run_len] == '%');
 
     // py::print("v1[1]:", v1[1]);
-    shared_ptr<Node> root = deserialize_node_(v1[1]);
+    shared_ptr<Node> root = deserialize_node_(rest);
     tree->root = root;
 }
 
 py::str serialize_forest_(const ForestStats &fr) {
-    py::str s = "f1^{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}\1{}"_s.format(fr.init_time_us,
+    py::str s = "f1^{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}🆃{}"_s.format(fr.init_time_us,
                                                                   fr.dio_bytes_r,
                                                                   fr.dio_bytes_w,
                                                                   fr.sio_bytes_r,
@@ -222,11 +226,11 @@ py::str serialize_forest_(const ForestStats &fr) {
 
 ForestStats deserialize_forest_(const py::str &bs) {
     auto fr = ForestStats();
-    // //py::print(bs);
+    // py::print(bs);
     string d = static_cast<std::string>(bs);
     auto v1 = split(d, "^", 1);
-    auto v2 = split(v1[1], "\1");
-    // //py::print("v2:", v2[0], v2[1], v2[2], v2[3], v2[4], v2[5], v2[6], v2[7], v2[8], v2[9], v2[10], v2[11]);
+    auto v2 = split(v1[1], "🆃");
+    // py::print("v2:", v2[0], v2[1], v2[2], v2[3], v2[4], v2[5], v2[6], v2[7], v2[8], v2[9], v2[10], v2[11]);
     fr.init_time_us = stoll(v2[0]);
     fr.dio_bytes_r = stoll(v2[1]);
     fr.dio_bytes_w = stoll(v2[2]);
