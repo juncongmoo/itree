@@ -6,7 +6,7 @@ using namespace pybind11::literals;
 
 // this will cause core dump
 // const static auto ast = py::module::import("ast");
-// run length #  ->  \x07;  % ==> \x06; ^ ==> \x05, $ => \x08
+// run length #  ->  \x07;  % ==> 🆃; ^ ==> ^, $ => \x08
 
 py::str run_length_dict(const py::dict &d) {
     if (d.empty())
@@ -32,7 +32,8 @@ py::dict str_to_dict(const string &dict_str) {
 
 py::str serialize_node_(const shared_ptr<Node> &n) {
     py::str s("n1*", 3);
-    return serialize_node_impl(n, s);
+    auto res = serialize_node_impl(n, s);
+    return res;
 }
 
 py::str serialize_node_impl(const shared_ptr<Node> &n, py::str &s) {
@@ -55,11 +56,11 @@ py::str serialize_node_impl(const shared_ptr<Node> &n, py::str &s) {
 
 py::str serialize_tree_(const shared_ptr<Tree> &n) {
     auto run_length_extra = run_length_dict(n->extra);
-    // py::str s = "t1\x05{tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}"_s.format(
-    py::str s = "t1\x05{},{},{},{},{},{},{},{}"_s.format(
+    // py::str s = "t1^{tid},{pid},{mode},{count},{depth},{monotonic},{zin_threshold},{run_length_extra}"_s.format(
+    py::str s = "t1^{},{},{},{},{},{},{},{}"_s.format(
         n->tid, n->pid, n->mode, n->count, n->depth, int(n->monotonic), n->zin_threshold, run_length_extra);
     py::str ns = serialize_node_(n->root);
-    return "{}\x06{}"_s.format(s, ns);
+    return "{}🆃{}"_s.format(s, ns);
 }
 
 shared_ptr<Node> deserialize_node_(py::str bs) {
@@ -148,8 +149,8 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     if (d[0] != 't') {
         throw invalid_argument(d);
     }
-    auto v1 = split(d, "\x06", 1);
-    auto v2 = split(v1[0], "\x05", 1);
+    auto v1 = split(d, "🆃", 1);
+    auto v2 = split(v1[0], "^", 1);
     int version = stoi(v2[0].substr(1));
     assert(version == 1);
     // py::print(version);
@@ -181,8 +182,8 @@ void _deserialize_tree(Tree* tree, py::str bs) {
     if (d[0] != 't') {
         throw invalid_argument(d);
     }
-    auto v1 = split(d, "\x06", 1);
-    auto v2 = split(v1[0], "\x05", 1);
+    auto v1 = split(d, "🆃", 1);
+    auto v2 = split(v1[0], "^", 1);
     int version = stoi(v2[0].substr(1));
     assert(version == 1);
     // py::print(version);
@@ -206,7 +207,7 @@ void _deserialize_tree(Tree* tree, py::str bs) {
 }
 
 py::str serialize_forest_(const ForestStats &fr) {
-    py::str s = "f1\x05{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}"_s.format(fr.init_time_us,
+    py::str s = "f1^{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}\x01{}"_s.format(fr.init_time_us,
                                                                   fr.dio_bytes_r,
                                                                   fr.dio_bytes_w,
                                                                   fr.sio_bytes_r,
@@ -225,7 +226,7 @@ ForestStats deserialize_forest_(const py::str &bs) {
     auto fr = ForestStats();
     // py::print(bs);
     string d = static_cast<std::string>(bs);
-    auto v1 = split(d, "\x05", 1);
+    auto v1 = split(d, "^", 1);
     auto v2 = split(v1[1], "\x01");
     // py::print("v2:", v2[0], v2[1], v2[2], v2[3], v2[4], v2[5], v2[6], v2[7], v2[8], v2[9], v2[10], v2[11]);
     fr.init_time_us = stoll(v2[0]);
