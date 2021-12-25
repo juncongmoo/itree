@@ -4,9 +4,6 @@ namespace py = pybind11;
 using namespace std;
 using namespace pybind11::literals;
 
-// this will cause core dump
-// const static auto ast = py::module::import("ast");
-
 py::str run_length_dict(const py::dict &d) {
     if (d.empty())
         return py::str("0#", 2);
@@ -15,18 +12,24 @@ py::str run_length_dict(const py::dict &d) {
     return extra_;
 }
 
+py::dict to_dict(const string &s) {
+    auto ast = py::module::import("ast");
+    try {
+        return ast.attr("literal_eval")(s);
+    } catch (const std::exception &e) {
+        cout << "warning: " << s << ", error: " << e.what() << endl;
+        return py::dict();
+    }
+}
+
 py::dict str_to_dict(const string &dict_str) {
     if (dict_str == "0#")
         return py::dict();
-    auto ast = py::module::import("ast");
     auto vs = split(dict_str, "#", 1);
-    try{
-        return ast.attr("literal_eval")(vs[1]);
-    }catch(const std::exception &e){
-        cout << "input:" << dict_str << "Error: " << e.what() <<endl;
+    if (vs.size() <= 1) {
         return py::dict();
     }
-    
+    return to_dict(vs[1]);
 }
 
 py::str serialize_node_(const shared_ptr<Node> &n) {
@@ -78,13 +81,7 @@ shared_ptr<Node> deserialize_node_(py::str bs) {
 }
 
 shared_ptr<Node> deserialize_node_impl(const string &d) {
-    auto ast = py::module::import("ast");
     vector<shared_ptr<Node>> stk_ = {create_virtual_node_()};
-    // auto ss = "{'name': 'World', 'number': 42, 'x': {'name': 'W', 'number': 4}}";
-    // py::dict z = ast.attr("literal_eval")(ss);
-    // py::print(z);
-    // py::print("vvvvvvvvvvvvvv");
-    // return nullptr;
     string s;
     size_t i = 0;
     // cout << "d:" << d << endl;
@@ -119,7 +116,7 @@ shared_ptr<Node> deserialize_node_impl(const string &d) {
             if (extra_len > 0) {
                 string dict_str = remaining.substr(0, extra_len);
                 // py::print(py::str(dict_str));
-                stk_.back()->extra = ast.attr("literal_eval")(dict_str);
+                stk_.back()->extra = to_dict(dict_str);
             }
             i += extra_len + 1 + extra_len_str.size() + 1;
             continue;
@@ -162,8 +159,7 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     auto v2 = split(t, "#", 1);
     int run_len = stoi(v2[0]);
     auto dict_ = v2[1].substr(0, run_len);
-    auto ast = py::module::import("ast");
-    tree->extra = ast.attr("literal_eval")(dict_);
+    tree->extra = to_dict(dict_);
     auto rest = v2[1].substr(run_len + 1);
     assert(v2[1][run_len] == '%');
 
@@ -172,7 +168,7 @@ shared_ptr<Tree> deserialize_tree_(py::str bs) {
     return tree;
 }
 
-void _deserialize_tree(Tree* tree, py::str bs) {
+void _deserialize_tree(Tree *tree, py::str bs) {
     string d = static_cast<std::string>(bs);
     if (d.empty())
         return;
@@ -191,13 +187,12 @@ void _deserialize_tree(Tree* tree, py::str bs) {
     tree->depth = stoi(v[4]);
     tree->monotonic = stoi(v[5]);
     tree->zin_threshold = stod(v[6]);
-    string& t = v[7];
+    string &t = v[7];
     auto v2 = split(t, "#", 1);
     int run_len = stoi(v2[0]);
     auto dict_ = v2[1].substr(0, run_len);
-    auto ast = py::module::import("ast");
-    tree->extra = ast.attr("literal_eval")(dict_);
-    auto rest = v2[1].substr(run_len+1);
+    tree->extra = to_dict(dict_);
+    auto rest = v2[1].substr(run_len + 1);
     assert(v2[1][run_len] == '%');
 
     shared_ptr<Node> root = deserialize_node_(rest);
