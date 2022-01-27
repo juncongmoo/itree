@@ -13,6 +13,9 @@ py::str run_length_dict(const py::dict &d) {
 }
 
 py::dict to_dict(const string &s) {
+    if (s.empty()) {
+        return py::dict();
+    }
     auto ast = py::module::import("ast");
     try {
         return ast.attr("literal_eval")(s);
