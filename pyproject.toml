@@ -13,5 +13,8 @@ archs = ["auto", "universal2", "arm64"]
 
 # On an Linux Intel runner with qemu installed, build Intel and ARM wheels
 [tool.cibuildwheel.linux]
-archs = ["auto", "aarch64"]
+archs = ["aarch64"]
 
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux_aarch64*"
+before-all = "apt-get install qemu binfmt-support qemu-user-static"
