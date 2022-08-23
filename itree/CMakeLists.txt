@@ -25,7 +25,6 @@ set(Python3_EXECUTABLE ${Python3_EXECUTABLE})
 
 add_subdirectory(pybind11 build_pybind11)
 
-
 set(TARGET_SOURCES tree.cpp node.cpp node_utils.cpp common.cpp nemo.cpp uuid.cpp pickle.cpp)
 
 pybind11_add_module(_itree py_main.cpp ${TARGET_SOURCES})
@@ -36,7 +35,6 @@ target_compile_definitions(_itree PRIVATE VERSION_INFO=${HIQ_VERSION_INFO})
 
 target_link_libraries(_itree PRIVATE pybind11::module z)
 
-#########################################################
 #find_package(pybind11 REQUIRED)
 if(LOCAL_BUILD)
     add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
