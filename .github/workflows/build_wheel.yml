@@ -9,10 +9,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [36, 37, 38, 39, 310]
+        python-version: [36, 37, 38, 39, 310, 311]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.1.0
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -85,18 +85,7 @@ jobs:
                 data: await fs.readFile(`./dist/${file}`)
               });
             }
-      #- name: Publish distribution 📦 to Test PyPI
-      #  if: steps.filter.outputs.itree == 'true'
-      #  uses: pypa/gh-action-pypi-publish@master
-      #  with:
-      #    verbose: true
-      #    skip_existing: true
-      #    verify_metadata: true
-      #    user: __token__
-      #    password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-      #    repository_url: https://test.pypi.org/legacy/
-
-      - name: Publish distribution 📦 to PyPI
+      - name: Publish distribution 📦 to Test PyPI
         if: steps.filter.outputs.itree == 'true'
         uses: pypa/gh-action-pypi-publish@master
         with:
@@ -104,5 +93,16 @@ jobs:
           skip_existing: true
           verify_metadata: true
           user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          repository_url: https://upload.pypi.org/legacy/
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+      #- name: Publish distribution 📦 to PyPI
+      #  if: steps.filter.outputs.itree == 'true'
+      #  uses: pypa/gh-action-pypi-publish@master
+      #  with:
+      #    verbose: true
+      #    skip_existing: true
+      #    verify_metadata: true
+      #    user: __token__
+      #    password: ${{ secrets.PYPI_API_TOKEN }}
+      #    repository_url: https://upload.pypi.org/legacy/
