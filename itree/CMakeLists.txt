@@ -29,7 +29,7 @@ set(TARGET_SOURCES tree.cpp node.cpp node_utils.cpp common.cpp nemo.cpp uuid.cpp
 
 pybind11_add_module(_itree py_main.cpp ${TARGET_SOURCES})
 
-# HIQ_VERSION_INFO is defined by setup.py and passed into the C++ code as a
+# HIQ_VERSION_INFO is defined by setup.py and passed to the C++ code as a
 # define (VERSION_INFO) here.
 target_compile_definitions(_itree PRIVATE VERSION_INFO=${HIQ_VERSION_INFO})
 
