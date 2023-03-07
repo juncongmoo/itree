@@ -186,7 +186,7 @@ merge virtual nodes into one
     m.def("time_s", &time_s);
     m.def("time_ms", &time_ms);
     m.def("time_us", &time_us);
-    
+
     m.def("serialize_node_", &serialize_node_);
     m.def("serialize_tree_", &serialize_tree_);
     m.def("serialize_forest_", &serialize_forest_);
@@ -198,6 +198,7 @@ merge virtual nodes into one
     m.def("mod",
           &mod,
           py::arg("module_name") = py::str(),
+          py::arg("verbose") = py::bool_(true),
           "load python module with a string-type module_name without "
           "exception(None will be returned in case of exception)");
     m.def("_exe",
