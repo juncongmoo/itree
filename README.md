@@ -87,13 +87,13 @@ Install ``itree`` by running:
 
 Run the `demo_tree()` function, a tree digraph will be generated:
 
-![](https://raw.githubusercontent.com/juncongmoo/itree/main/docs/demo_tree.png)
+![demo_tree](https://raw.githubusercontent.com/juncongmoo/itree/main/docs/demo_tree.png)
 
 The green circle node is a virtual node. The yellow record box is the node with the longest interval.
 
 A virtual node is a conceptual node which could have many subnodes/subtrees.
 
-![](https://raw.githubusercontent.com/juncongmoo/itree/main/docs/itree_vnode_small.png)
+![vnode](https://raw.githubusercontent.com/juncongmoo/itree/main/docs/itree_vnode_small.png)
 
 ## Development
 
