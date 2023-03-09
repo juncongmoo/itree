@@ -1,15 +1,14 @@
-# iTree - an Interval Tree library
+# 🌳 iTree - an Interval Tree library
 
 ![itree](https://raw.githubusercontent.com/juncongmoo/itree/main/docs/forest.jpg)
-
-
 
 In computer science, an `interval tree` is a tree data structure to hold intervals. Every node in `itree` has a `start` and an `end` value.
 
 ## Installation
 
+`itree` supports Linux, MacOS and Windows operating systems.
 
-Install ``itree`` by running:
+You can install ``itree`` by running:
 
 ```bash
   pip install py-itree

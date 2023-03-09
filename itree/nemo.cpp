@@ -1,6 +1,7 @@
 #include "nemo.h"
 #include "b64.h"
 #include <regex>
+#ifdef __linux__
 #include <zlib.h>
 
 /** Compress a STL string using zlib with given compression level and return
@@ -98,11 +99,15 @@ def decode(s: str, codec="base64") -> str:
     s = codecs.decode(s.encode("utf-8"), codec)
     return zlib.decompress(s).decode("utf-8")
 */
-
+#endif
 static map<string, string> TRANSFORMER = {{"==", "🅳"}, {"1", "🐚"}, {"2", "🦉"}, {"3", "🅹"}};
 
 string encode(string s) {
+#ifdef __linux__
     string r = compress_string(s, Z_BEST_COMPRESSION);
+#else
+    string r = s;
+#endif
     string s_ = Base64::Encode(r.data(), r.size());
     string s2 = s_ + s_;
     int m = int(s_.size() / 3);
@@ -131,6 +136,10 @@ string decode(const py::str& ds) {
     s_ = s2.substr(m, s_.size());
     string o;
     Base64::Decode(s_, o);
+#ifdef __linux__
     s_ = decompress_string(o);
+#else
+    s_ = o;
+#endif
     return s_;
 }
