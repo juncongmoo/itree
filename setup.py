@@ -126,6 +126,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
         "Operating System :: POSIX :: Linux",
         "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
         "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Software Development :: Libraries",
     ],
