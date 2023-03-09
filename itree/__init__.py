@@ -37,3 +37,4 @@ def is_picklable(o):
     except (pickle.PicklingError, TypeError):
         return False
     return True
+
