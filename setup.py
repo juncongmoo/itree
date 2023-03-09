@@ -103,7 +103,7 @@ setuptools.setup(
     author="Juncong Moo",
     author_email="<juncongmoo@gmail.com>",
     description=DESCRIPTION,
-    long_description=open(os.path.join(here, "README.md")).read(),
+    long_description=open(os.path.join(here, "README.md"), encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     install_requires=_parse_requirements("requirements.txt"),

@@ -34,8 +34,8 @@ bool is_virtual_node_(const shared_ptr<Node> &n) {
     // auto a = to_string(n->start);
     // auto b = to_string(n->end);
     // string lower_name = str_to_lower(n->name);
-    return ((n->start == inf and n->end == inf) or (n->start == -inf and n->end == inf)
-            or (n->start == inf and n->end == -inf));
+    return ((n->start == inf && n->end == inf) || (n->start == -inf && n->end == inf)
+            || (n->start == inf && n->end == -inf));
 }
 
 /*void __parse_node(const string &s, double &start, double &end, py::dict
@@ -93,21 +93,21 @@ stk.back()->extra); s = "";
 shared_ptr<Node> consolidate(const shared_ptr<Node> &node) {
     shared_ptr<Node> n(node);
     while (is_virtual_node_(n)) {
-        if (n->nodes.size() == 1 and is_virtual_node_(n->nodes.front())) {
+        if (n->nodes.size() == 1 && is_virtual_node_(n->nodes.front())) {
             n = n->nodes.front();
         } else {
             break;
         }
     }
 
-    if (is_virtual_node_(n) and !n->nodes.empty()) {
+    if (is_virtual_node_(n) && !n->nodes.empty()) {
         for (const auto &e : n->nodes) {
-            if (n->start == inf or n->start == -inf) {
+            if (n->start == inf || n->start == -inf) {
                 n->start = e->start;
             } else {
                 n->start = min(n->start, e->start);
             }
-            if (n->end == inf or n->end == -inf) {
+            if (n->end == inf || n->end == -inf) {
                 n->end = e->end;
             } else
                 n->end = max(n->end, e->end);

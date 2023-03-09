@@ -10,6 +10,12 @@
 #include <utility>
 
 // https://stackoverflow.com/questions/17902405/how-to-implement-make-unique-function-in-c11
+#ifdef _WIN32
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+#else
 namespace std {
 template <class T>
 struct _Unique_if {
@@ -40,6 +46,7 @@ typename _Unique_if<T>::_Unknown_bound make_unique(size_t n) {
 template <class T, class... Args>
 typename _Unique_if<T>::_Known_bound make_unique(Args &&...) = delete;
 } // namespace std
+#endif
 
 // https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template <typename... Args>
