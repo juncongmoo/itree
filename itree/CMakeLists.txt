@@ -15,7 +15,8 @@ else()
 endif()
 
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS "-Wall")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -33,12 +34,22 @@ pybind11_add_module(_itree py_main.cpp ${TARGET_SOURCES})
 # define (VERSION_INFO) here.
 target_compile_definitions(_itree PRIVATE VERSION_INFO=${HIQ_VERSION_INFO})
 
-target_link_libraries(_itree PRIVATE pybind11::module z)
+IF (WIN32)
+    find_package(Python REQUIRED COMPONENTS Interpreter Development)
+    target_link_libraries(_itree PRIVATE pybind11::module Python::Python)
+ELSE()
+    target_link_libraries(_itree PRIVATE pybind11::module z)
+ENDIF()
 
 #find_package(pybind11 REQUIRED)
 if(LOCAL_BUILD)
     add_executable(_itree.exe main.cpp ${TARGET_SOURCES})
+IF (WIN32)
+    find_package(Python REQUIRED COMPONENTS Interpreter Development)
+    target_link_libraries(_itree.exe PRIVATE pybind11::embed Python::Python)
+ELSE()
     target_link_libraries(_itree.exe PRIVATE pybind11::embed z)
+ENDIF()
 else()
     message("building in ci")
 endif()

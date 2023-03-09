@@ -4,7 +4,7 @@
 #include "pickle.h"
 #include <assert.h>
 
-bool Tree::is_valid() { return root != nullptr and !stk.empty(); }
+bool Tree::is_valid() { return root != nullptr && !stk.empty(); }
 
 shared_ptr<Node> Tree::get_root() { return root; }
 
@@ -31,13 +31,13 @@ const static string ZERO_SPAN_NAME = "\t";
 void remove_zin(list<shared_ptr<Node>> &nodes);
 
 void Tree::finish(const string &name, double end, const py::dict &extra) {
-    if (stk.empty() or (stk.back()->name != name)) {
+    if (stk.empty() || (stk.back()->name != name)) {
         printf("💀 debug info: %zu, %s, %s\n", stk.size(), stk.back()->name.c_str(), name.c_str());
         throw runtime_error("stk should be non-empty and name should match!");
     }
 
 #if 1
-    if (mode == 0 and abs(end - stk.back()->start) < zin_threshold and stk.back()->nodes.empty()) {
+    if (mode == 0 && abs(end - stk.back()->start) < zin_threshold && stk.back()->nodes.empty()) {
         // printf("debug info: %d, %s, %s\n", stk.size(), stk.back()->name.c_str(),
         // name.c_str());
         stk.back()->name = ZERO_SPAN_NAME;
@@ -55,7 +55,7 @@ void Tree::finish(const string &name, double end, const py::dict &extra) {
 
 // remove ZIN
 #ifdef REMOVE_ZSN
-    if (!stk.back()->nodes.empty() and mode == 0 or (mode == 1 and extra.empty())) {
+    if (!stk.back()->nodes.empty() && mode == 0 || (mode == 1 && extra.empty())) {
         auto itr = stk.back()->nodes.cbegin();
         while (itr != stk.back()->nodes.cend()) {
             if ((*itr)->name == ZERO_SPAN_NAME) {
@@ -73,7 +73,7 @@ void Tree::finish(const string &name, double end, const py::dict &extra) {
 }
 
 bool Tree::add_node(shared_ptr<Node> n) {
-    if (n == nullptr or n->span() < zin_threshold)
+    if (n == nullptr || n->span() < zin_threshold)
         return false;
     if (stk.empty()) {
         root = n;

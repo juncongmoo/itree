@@ -59,7 +59,7 @@ std::string _strip(const std::string &s) {
 // A stop-gap function
 bool is_str_dict(const string &s) {
     string s_ = _strip(s);
-    return !s_.empty() and s_[0] == '{' and s_.back() == '}';
+    return !s_.empty() && s_[0] == '{' && s_.back() == '}';
 }
 
 void _read(const string &buffer, string &str, int &offset) {
