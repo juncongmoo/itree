@@ -108,6 +108,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=_parse_requirements("requirements.txt"),
     cmdclass=dict(build_ext=BuildCMakeExtension),
+    url="https://github.com/juncongmoo/itree",
     ext_modules=[CMakeExtension("_itree", source_dir="itree")],
     zip_safe=False,
     include_package_data=True,
