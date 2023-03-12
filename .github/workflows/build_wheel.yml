@@ -9,9 +9,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -19,15 +20,18 @@ jobs:
             itree:
               - 'itree/**'
 
-      - uses: actions/setup-python@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4.3.0
         with:
-          python-version: '3.9'
-      
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - run: python --version
       - name: Install cibuildwheel
         if: steps.filter.outputs.itree == 'true'
         run: |
-          python -m pip --disable-pip-version-check install cibuildwheel==2.9.0 twine==4.0.1
-      
+          python -m pip --disable-pip-version-check install cibuildwheel==2.12.1 twine==4.0.2
+
       - uses: docker/setup-qemu-action@v1
         if: runner.os == 'Linux'
         name: Set up QEMU
@@ -50,7 +54,7 @@ jobs:
     needs: [build_wheels]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
