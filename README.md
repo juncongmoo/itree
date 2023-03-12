@@ -13,6 +13,16 @@ You can install ``itree`` by running:
 ```bash
   pip install py-itree
 ```
+
+🍀 For MacOS with M1 Chip, or some Windows OS, or embeded system where the method above doesn't work, please use the following workaround.
+
+- install [cmake](https://cmake.org/)
+- run the following command to build it locally:
+```bash
+pip install https://github.com/juncongmoo/itree/archive/refs/tags/tag-bf9f3aada064acf3ce4db6fc58ed2e744caee0a3.tar.gz
+``` 
+
+
 ## Quick Start
 
 - Symbol For Node And Tree
