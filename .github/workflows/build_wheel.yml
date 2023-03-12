@@ -12,7 +12,7 @@ jobs:
         python-version: [3.8]
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -21,14 +21,16 @@ jobs:
               - 'itree/**'
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - run: python --version
       
       - name: Install cibuildwheel
         if: steps.filter.outputs.itree == 'true'
         run: |
-          python${{ matrix.python-version }} -m pip --disable-pip-version-check install cibuildwheel==2.9.0 twine==4.0.1
+          python -m pip --disable-pip-version-check install cibuildwheel==2.9.0 twine==4.0.1
       
       - uses: docker/setup-qemu-action@v1
         if: runner.os == 'Linux'
