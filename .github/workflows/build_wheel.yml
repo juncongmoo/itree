@@ -8,7 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest, windows-2019]
+        os: [windows-latest]
+        python-version: [3.8]
 
     steps:
       - uses: actions/checkout@v2.1.0
@@ -19,14 +20,15 @@ jobs:
             itree:
               - 'itree/**'
 
-      - uses: actions/setup-python@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: ${{ matrix.python-version }}
       
       - name: Install cibuildwheel
         if: steps.filter.outputs.itree == 'true'
         run: |
-          python -m pip --disable-pip-version-check install cibuildwheel==2.9.0 twine==4.0.1
+          python${{ matrix.python-version }} -m pip --disable-pip-version-check install cibuildwheel==2.9.0 twine==4.0.1
       
       - uses: docker/setup-qemu-action@v1
         if: runner.os == 'Linux'
@@ -35,7 +37,7 @@ jobs:
       - name: Build wheels
         if: steps.filter.outputs.itree == 'true'
         run: |
-          python -m cibuildwheel --output-dir dist
+          python${{ matrix.python-version }} -m cibuildwheel --output-dir dist
           twine check ./dist/*.whl
 
       - uses: actions/upload-artifact@v2
