@@ -8,8 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
-        python-version: [3.8]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.8, 3.9, 3.10, 3.11]
 
     steps:
       - uses: actions/checkout@v3
@@ -25,8 +25,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - run: python --version
-      
+      #- run: python --version
       - name: Install cibuildwheel
         if: steps.filter.outputs.itree == 'true'
         run: |
@@ -54,7 +53,7 @@ jobs:
     needs: [build_wheels]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
