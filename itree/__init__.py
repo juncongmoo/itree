@@ -12,6 +12,7 @@ from .tree import Tree
 
 from .node import serialize_node, deserialize_node
 
+
 # ForestStats is a collection of trees
 ForestStats = _itree.ForestStats
 
