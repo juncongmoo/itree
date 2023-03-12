@@ -14,7 +14,7 @@ You can install ``itree`` by running:
   pip install py-itree
 ```
 
-🍀 For MacOS with M1 Chip, or some Windows OS, or embeded system where the method above doesn't work, please use the following workaround.
+🍀 For MacOS with M1 Chip, some Windows OS, embedded systems, or different python versions where the method above doesn't work, please use the following workaround.
 
 - install [cmake](https://cmake.org/)
 - run the following command to build it locally:
