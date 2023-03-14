@@ -8,18 +8,22 @@ In computer science, an `interval tree` is a tree data structure to hold interva
 
 `itree` supports Linux, MacOS and Windows operating systems.
 
+### Installation With `pip`
+
 You can install ``itree`` by running:
 
 ```bash
   pip install py-itree
 ```
 
+### Build From Source With `cmake`
+
 🍀 For MacOS with M1 Chip, some Windows OS, embedded systems, or different python versions where the method above doesn't work, please use the following workaround.
 
-- install [cmake](https://cmake.org/)
-- run the following command to build it locally:
+- Install [cmake](https://cmake.org/) (version>3.4)
+- Run the following command to build it locally:
 ```bash
-pip install https://github.com/juncongmoo/itree/archive/refs/tags/tag-bf9f3aada064acf3ce4db6fc58ed2e744caee0a3.tar.gz
+pip install https://github.com/juncongmoo/itree/archive/refs/tags/v0.0.18.tar.gz
 ``` 
 
 
