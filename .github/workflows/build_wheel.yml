@@ -24,7 +24,6 @@ jobs:
         uses: actions/setup-python@v4.3.0
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
 
       - run: python --version
       - name: Install cibuildwheel
