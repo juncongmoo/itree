@@ -198,8 +198,9 @@ merge virtual nodes into one
     m.def("mod",
           &mod,
           py::arg("module_name") = py::str(),
+          py::arg("attr") = py::str(),
           py::arg("verbose") = py::bool_(true),
-          "load python module with a string-type module_name without "
+          "load python module with a string-type module_name, and optionally get its attribute(class/function...), without "
           "exception(None will be returned in case of exception)");
     m.def("_exe",
           &_exe,
