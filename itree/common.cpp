@@ -118,9 +118,12 @@ uint64_t time_s() {
     return chrono::duration_cast<std::chrono::seconds>(chrono::system_clock::now().time_since_epoch()).count();
 }
 
-py::object mod(const py::str &s, py::bool_ verbose) {
+py::object mod(const py::str &s, const py::str &attr, py::bool_ verbose) {
     try {
-        return py::module::import("importlib").attr("import_module")(s);
+        auto r = py::module::import("importlib").attr("import_module")(s);
+        const std::string t = std::string(attr);
+        if (t.empty()) return r;
+        return r.attr(attr);
     } catch (const std::exception &e) {
         if (verbose)
             cout << __FUNCTION__ << "," << __LINE__ << "," << static_cast<string>(s) << ": " << e.what() << endl;

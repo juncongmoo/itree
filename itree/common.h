@@ -28,7 +28,7 @@ uint64_t time_ms();
 uint64_t time_s();
 
 // py::object __mod(const string &);
-py::object mod(const py::str &, py::bool_ verbose=true);
+py::object mod(const py::str &, const py::str& attr="", py::bool_ verbose=true);
 // py::object mod2(const py::list &);
 py::dict _exe(const string &, py::dict &l);
 // py::object load_json();
