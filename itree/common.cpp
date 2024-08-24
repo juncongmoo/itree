@@ -12,7 +12,8 @@ string b64_to_str(const string &s) {
     return out;
 }
 
-/*VS split(string s, const string &delimiter) {
+/*
+VS split(string s, const string &delimiter) {
     VS r;
     size_t pos = 0;
     while ((pos = s.find(delimiter)) != string::npos) {
