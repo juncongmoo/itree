@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v3
@@ -29,9 +29,9 @@ jobs:
       - name: Install cibuildwheel
         if: steps.filter.outputs.itree == 'true'
         run: |
-          python -m pip --disable-pip-version-check install cibuildwheel==2.12.1 twine==4.0.2
+          python -m pip --disable-pip-version-check install cibuildwheel==2.20.0 twine==4.0.2
 
-      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-qemu-action@v2
         if: runner.os == 'Linux'
         name: Set up QEMU
 
@@ -41,7 +41,7 @@ jobs:
           python -m cibuildwheel --output-dir dist
           twine check ./dist/*.whl
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: steps.filter.outputs.itree == 'true'
         with:
           name: dist
@@ -69,7 +69,7 @@ jobs:
       - name: Release
         if: steps.filter.outputs.itree == 'true'
         # https://github.com/actions/upload-release-asset/issues/47
-        uses: actions/github-script@v2
+        uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -105,7 +105,7 @@ jobs:
       #    repository_url: https://test.pypi.org/legacy/
 
       - name: Publish distribution 📦 to PyPI
-        if: steps.filter.outputs.itree == 'true'
+        #if: steps.filter.outputs.itree == 'true'
         uses: pypa/gh-action-pypi-publish@master
         with:
           verbose: true
