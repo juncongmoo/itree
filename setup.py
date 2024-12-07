@@ -57,6 +57,7 @@ class BuildCMakeExtension(build_ext.build_ext):
     def _check_build_environment(self):
         """Check for required build tools: CMake, C++ compiler, and python dev."""
         try:
+            print("Environment in _check_build_environment:", os.environ.copy())
             subprocess.check_call(["cmake", "--version"], env=os.environ.copy())
         except OSError as e:
             ext_names = ", ".join(e.name for e in self.extensions)
@@ -75,6 +76,7 @@ class BuildCMakeExtension(build_ext.build_ext):
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extension_dir}",
             f"-DCMAKE_BUILD_TYPE={build_cfg}",
         ]
+        print("Environment in build_extension:", os.environ.copy())
         os.makedirs(self.build_temp, exist_ok=True)
         subprocess.check_call(
             ["cmake", ext.source_dir] + cmake_args, cwd=self.build_temp, env=os.environ.copy()
@@ -96,7 +98,7 @@ class BuildCMakeExtension(build_ext.build_ext):
 
 VERSION = _get_tree_version()
 DESCRIPTION = "A Interval Tree Library"
-
+print("Environment at top:", os.environ.copy())
 setuptools.setup(
     name="py-itree",
     version=VERSION,
