@@ -23,7 +23,7 @@ You can install ``itree`` by running:
 - Install [cmake](https://cmake.org/) (version>3.4)
 - Run the following command to build it locally:
 ```bash
-pip install https://github.com/juncongmoo/itree/archive/refs/tags/v0.0.18.tar.gz
+pip install --no-build-isolation git+https://github.com/juncongmoo/itree.git
 ``` 
 
 
