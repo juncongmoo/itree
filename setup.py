@@ -57,7 +57,7 @@ class BuildCMakeExtension(build_ext.build_ext):
     def _check_build_environment(self):
         """Check for required build tools: CMake, C++ compiler, and python dev."""
         try:
-            subprocess.check_call(["cmake", "--version"])
+            subprocess.check_call(["cmake", "--version"], env=os.environ.copy())
         except OSError as e:
             ext_names = ", ".join(e.name for e in self.extensions)
             raise RuntimeError(
@@ -77,11 +77,11 @@ class BuildCMakeExtension(build_ext.build_ext):
         ]
         os.makedirs(self.build_temp, exist_ok=True)
         subprocess.check_call(
-            ["cmake", ext.source_dir] + cmake_args, cwd=self.build_temp
+            ["cmake", ext.source_dir] + cmake_args, cwd=self.build_temp, env=os.environ.copy()
         )
         subprocess.check_call(
             ["cmake", "--build", ".", f"-j{os.cpu_count()}", "--config", build_cfg],
-            cwd=self.build_temp,
+            cwd=self.build_temp, env=os.environ.copy()
         )
 
         # Force output to <extension_dir>/. Amends CMake multigenerator output paths
